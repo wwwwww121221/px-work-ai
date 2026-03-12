@@ -1,11 +1,13 @@
 package com.pxwork.api;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 
-// 暂时排除数据库自动配置，防止因为还没连数据库导致启动报错
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
+@ComponentScan(basePackages = {"com.pxwork"})
+@MapperScan("com.pxwork.common.mapper")
 public class PxWorkApplication {
 
     public static void main(String[] args) {
