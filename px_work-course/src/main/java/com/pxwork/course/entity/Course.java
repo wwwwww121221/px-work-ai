@@ -47,6 +47,11 @@ public class Course implements Serializable {
     private Integer isRequired;
 
     /**
+     * 状态 (1: 已发布, 0: 未发布)
+     */
+    private Integer status;
+
+    /**
      * 分类ID
      */
     private Long categoryId;

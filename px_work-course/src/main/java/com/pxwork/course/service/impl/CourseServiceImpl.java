@@ -81,4 +81,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         // 删除课程本身
         return removeById(courseId);
     }
+
+    @Override
+    public List<Course> getPublishedCourses() {
+        return list(new LambdaQueryWrapper<Course>()
+                .eq(Course::getStatus, 1) // 1: 已发布
+                .orderByDesc(Course::getCreatedAt));
+    }
 }
