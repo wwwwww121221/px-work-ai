@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.dev33.satoken.secure.SaSecureUtil;
+import cn.dev33.satoken.stp.StpUtil;
 import com.pxwork.common.entity.Department;
 import com.pxwork.common.entity.User;
 import com.pxwork.common.entity.UserDepartment;
 import com.pxwork.common.mapper.UserMapper;
+import com.pxwork.common.request.FrontendLoginRequest;
 import com.pxwork.common.service.DepartmentService;
 import com.pxwork.common.service.UserDepartmentService;
 import com.pxwork.common.service.UserService;
@@ -116,6 +118,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         
         return userPage;
+    }
+
+    @Override
+    public String login(FrontendLoginRequest request) {
+        User user = this.getOne(new LambdaQueryWrapper<User>()
+                .eq(User::getEmail, request.getEmail()));
+        if (user == null) {
+            throw new RuntimeException("账号或密码错误");
+        }
+        String password = SaSecureUtil.sha256(request.getPassword());
+        if (!password.equals(user.getPassword())) {
+            throw new RuntimeException("账号或密码错误");
+        }
+        StpUtil.login(user.getId(), "Frontend");
+        return StpUtil.getTokenValue();
     }
 
     private void saveDepartments(Long userId, List<Long> departmentIds) {

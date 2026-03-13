@@ -2,6 +2,7 @@ package com.pxwork.common.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pxwork.common.entity.User;
+import com.pxwork.common.request.FrontendLoginRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -19,4 +20,6 @@ public interface UserService extends IService<User> {
     boolean updateUser(User user);
     
     Page<User> pageWithDepts(Page<User> page, String name);
+
+    String login(FrontendLoginRequest request);
 }

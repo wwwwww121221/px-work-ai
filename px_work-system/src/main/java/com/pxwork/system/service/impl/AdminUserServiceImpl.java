@@ -2,7 +2,9 @@ package com.pxwork.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import cn.dev33.satoken.secure.SaSecureUtil;
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.pxwork.common.request.BackendLoginRequest;
 import com.pxwork.system.entity.AdminUser;
 import com.pxwork.system.entity.AdminUserRole;
 import com.pxwork.system.mapper.AdminUserMapper;
@@ -55,6 +57,21 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
             saveRoles(adminUser.getId(), adminUser.getRoleIds());
         }
         return true;
+    }
+
+    @Override
+    public String login(BackendLoginRequest request) {
+        AdminUser adminUser = this.getOne(new LambdaQueryWrapper<AdminUser>()
+                .eq(AdminUser::getEmail, request.getEmail()));
+        if (adminUser == null) {
+            throw new RuntimeException("账号或密码错误");
+        }
+        String password = SaSecureUtil.sha256(request.getPassword());
+        if (!password.equals(adminUser.getPassword())) {
+            throw new RuntimeException("账号或密码错误");
+        }
+        StpUtil.login(adminUser.getId());
+        return StpUtil.getTokenValue();
     }
 
     private void saveRoles(Long adminUserId, List<Long> roleIds) {
