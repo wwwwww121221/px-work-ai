@@ -1,5 +1,5 @@
 server:
-  port: 8081 # 由于8080端口被占用，临时修改为8081
+  port: 8082 # 由于8081端口被占用，临时修改为8082
   
 spring:
   application:
@@ -9,6 +9,9 @@ spring:
     url: jdbc:mysql://localhost:3306/platrom?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: platrom
     password: "123456"
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/
 
 mybatis-plus:
   configuration:
