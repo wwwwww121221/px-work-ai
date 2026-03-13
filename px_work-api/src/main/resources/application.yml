@@ -1,5 +1,8 @@
 server:
   port: 8082 # 由于8081端口被占用，临时修改为8082
+
+app:
+  upload-dir: D:/px/backend/uploads
   
 spring:
   application:

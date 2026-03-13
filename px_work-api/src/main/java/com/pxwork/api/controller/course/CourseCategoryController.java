@@ -2,7 +2,9 @@ package com.pxwork.api.controller.course;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.pxwork.common.utils.Result;
+import com.pxwork.course.entity.Course;
 import com.pxwork.course.entity.CourseCategory;
+import com.pxwork.course.service.CourseService;
 import com.pxwork.course.service.CourseCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +20,8 @@ public class CourseCategoryController {
 
     @Autowired
     private CourseCategoryService courseCategoryService;
+    @Autowired
+    private CourseService courseService;
 
     @Operation(summary = "获取分类树形结构")
     @GetMapping("/tree")
@@ -44,6 +48,10 @@ public class CourseCategoryController {
         long count = courseCategoryService.count(new LambdaQueryWrapper<CourseCategory>().eq(CourseCategory::getParentId, id));
         if (count > 0) {
             return Result.fail("请先删除子分类");
+        }
+        long courseCount = courseService.count(new LambdaQueryWrapper<Course>().eq(Course::getCategoryId, id));
+        if (courseCount > 0) {
+            return Result.fail("该分类下仍有课程，无法删除");
         }
         return Result.success(courseCategoryService.removeById(id));
     }

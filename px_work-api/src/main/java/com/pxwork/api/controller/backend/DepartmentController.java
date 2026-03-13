@@ -1,7 +1,10 @@
 package com.pxwork.api.controller.backend;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.pxwork.common.entity.Department;
+import com.pxwork.common.entity.UserDepartment;
 import com.pxwork.common.service.DepartmentService;
+import com.pxwork.common.service.UserDepartmentService;
 import com.pxwork.common.utils.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +28,8 @@ public class DepartmentController {
 
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private UserDepartmentService userDepartmentService;
 
     @Operation(summary = "部门树形列表", description = "获取部门树形结构")
     @GetMapping("/tree")
@@ -49,6 +54,14 @@ public class DepartmentController {
     @Operation(summary = "删除部门", description = "根据ID删除部门")
     @PostMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
+        long children = departmentService.count(new LambdaQueryWrapper<Department>().eq(Department::getParentId, id));
+        if (children > 0) {
+            return Result.fail("请先删除子部门");
+        }
+        long userRefs = userDepartmentService.count(new LambdaQueryWrapper<UserDepartment>().eq(UserDepartment::getDepartmentId, id));
+        if (userRefs > 0) {
+            return Result.fail("该部门下仍有关联学员，无法删除");
+        }
         boolean success = departmentService.removeById(id);
         return success ? Result.success(true) : Result.fail("删除失败");
     }

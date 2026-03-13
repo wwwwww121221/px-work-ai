@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pxwork.common.utils.Result;
 import com.pxwork.course.entity.Course;
+import com.pxwork.course.entity.CourseChapter;
+import com.pxwork.course.service.CourseChapterService;
 import com.pxwork.course.service.CourseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +20,8 @@ public class CourseController {
 
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private CourseChapterService courseChapterService;
 
     @Operation(summary = "课程分页列表")
     @GetMapping("/list")
@@ -56,6 +60,10 @@ public class CourseController {
     @Operation(summary = "删除课程(级联删除章节和课时)")
     @DeleteMapping("/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
+        long chapterCount = courseChapterService.count(new LambdaQueryWrapper<CourseChapter>().eq(CourseChapter::getCourseId, id));
+        if (chapterCount > 0) {
+            return Result.fail("该课程下仍有章节，请先删除章节和课时");
+        }
         return Result.success(courseService.removeCourseWithRelations(id));
     }
 

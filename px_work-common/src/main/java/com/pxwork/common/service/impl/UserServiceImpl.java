@@ -3,6 +3,7 @@ package com.pxwork.common.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import cn.dev33.satoken.secure.SaSecureUtil;
 import com.pxwork.common.entity.Department;
 import com.pxwork.common.entity.User;
 import com.pxwork.common.entity.UserDepartment;
@@ -39,13 +40,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createUser(User user) {
-        // 1. 保存学员基本信息
+        if (StringUtils.isNotBlank(user.getPassword())) {
+            user.setPassword(SaSecureUtil.sha256(user.getPassword()));
+        }
         boolean saved = this.save(user);
         if (!saved) {
             return false;
         }
 
-        // 2. 保存部门关联
         saveDepartments(user.getId(), user.getDepartmentIds());
         return true;
     }

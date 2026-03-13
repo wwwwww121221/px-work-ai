@@ -16,22 +16,18 @@
         <dependency>
             <groupId>com.pxwork</groupId>
             <artifactId>px_work-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.pxwork</groupId>
             <artifactId>px_work-system</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.pxwork</groupId>
             <artifactId>px_work-course</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.pxwork</groupId>
             <artifactId>px_work-resource</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Swagger / SpringDoc -->
@@ -45,6 +41,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot3-starter</artifactId>
         </dependency>
 
         <!-- Database Driver -->

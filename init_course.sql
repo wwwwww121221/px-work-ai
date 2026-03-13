@@ -12,9 +12,9 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `category_id` bigint NOT NULL DEFAULT '0' COMMENT '分类ID',
   `name` varchar(200) NOT NULL COMMENT '课程名称',
-  `cover_url` varchar(500) DEFAULT NULL COMMENT '封面图片URL',
-  `description` text COMMENT '课程简介',
-  `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态: 0-草稿, 1-发布',
+  `thumb` varchar(500) DEFAULT NULL COMMENT '封面图片URL',
+  `short_desc` text COMMENT '课程简介',
+  `is_required` tinyint NOT NULL DEFAULT '0' COMMENT '是否必修: 0-否, 1-是',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)

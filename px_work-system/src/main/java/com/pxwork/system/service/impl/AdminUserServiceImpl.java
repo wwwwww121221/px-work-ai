@@ -1,12 +1,14 @@
 package com.pxwork.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.dev33.satoken.secure.SaSecureUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pxwork.system.entity.AdminUser;
 import com.pxwork.system.entity.AdminUserRole;
 import com.pxwork.system.mapper.AdminUserMapper;
 import com.pxwork.system.service.AdminUserRoleService;
 import com.pxwork.system.service.AdminUserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +25,14 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createAdminUser(AdminUser adminUser) {
-        // 1. 保存管理员基本信息
+        if (StringUtils.isNotBlank(adminUser.getPassword())) {
+            adminUser.setPassword(SaSecureUtil.sha256(adminUser.getPassword()));
+        }
         boolean saved = this.save(adminUser);
         if (!saved) {
             return false;
         }
 
-        // 2. 保存角色关联
         saveRoles(adminUser.getId(), adminUser.getRoleIds());
         return true;
     }
