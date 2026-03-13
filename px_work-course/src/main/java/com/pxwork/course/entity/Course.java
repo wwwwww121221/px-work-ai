@@ -1,7 +1,6 @@
 package com.pxwork.course.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -11,6 +10,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.baomidou.mybatisplus.annotation.TableField;
 
 /**
  * 课程主表
@@ -27,29 +27,29 @@ public class Course implements Serializable {
     private Long id;
 
     /**
-     * 分类ID
-     */
-    private Long categoryId;
-
-    /**
      * 课程名称
      */
     private String name;
 
     /**
-     * 封面图片URL
+     * 封面图
      */
-    private String coverUrl;
+    private String thumb;
 
     /**
-     * 课程简介
+     * 简短描述
      */
-    private String description;
+    private String shortDesc;
 
     /**
-     * 状态: 0-草稿, 1-发布
+     * 是否必修 (1: 是, 0: 否)
      */
-    private Integer status;
+    private Integer isRequired;
+
+    /**
+     * 分类ID
+     */
+    private Long categoryId;
 
     private LocalDateTime createdAt;
 

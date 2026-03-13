@@ -22,6 +22,7 @@
         <dependency>
             <groupId>com.pxwork</groupId>
             <artifactId>px_work-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Lombok 依赖 -->
