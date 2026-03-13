@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.pxwork"})
-@MapperScan("com.pxwork.common.mapper")
+@MapperScan("com.pxwork.**.mapper")
 public class PxWorkApplication {
 
     public static void main(String[] args) {

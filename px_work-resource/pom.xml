@@ -11,4 +11,12 @@
 
     <artifactId>px_work-resource</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.pxwork</groupId>
+            <artifactId>px_work-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>
