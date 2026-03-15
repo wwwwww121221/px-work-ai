@@ -2,6 +2,7 @@ package com.pxwork.api.controller.backend;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pxwork.common.utils.Result;
 import com.pxwork.course.entity.ProcessEvaluation;
 import com.pxwork.course.service.ProcessEvaluationService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -26,45 +32,44 @@ import lombok.Data;
 @RequestMapping("/backend/evaluation")
 public class BackendEvaluationController {
 
-    private static final BigDecimal MAX_DIMENSION_SCORE = BigDecimal.valueOf(6);
-    private static final BigDecimal MAX_TOTAL_SCORE = BigDecimal.valueOf(30);
-
     @Autowired
     private ProcessEvaluationService processEvaluationService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Operation(summary = "讲师评分")
     @PutMapping("/score")
     public Result<Map<String, Object>> score(@RequestBody @Validated ScoreRequest request) {
-        if (!isValidDimensionScore(request.getScoreProgress())
-                || !isValidDimensionScore(request.getScorePrep())
-                || !isValidDimensionScore(request.getScoreInteraction())
-                || !isValidDimensionScore(request.getScoreDiscussion())
-                || !isValidDimensionScore(request.getScorePractical())) {
-            return Result.fail("每个维度分数必须在0到6之间");
+        BigDecimal totalScore = BigDecimal.ZERO;
+        for (EvaluationItem item : request.getEvaluationItems()) {
+            if (item.getScore() == null) {
+                return Result.fail("评价项分数不能为空");
+            }
+            if (item.getScore().compareTo(BigDecimal.ZERO) < 0) {
+                return Result.fail("评价项分数不能为负数");
+            }
+            totalScore = totalScore.add(item.getScore());
         }
-        BigDecimal totalScore = request.getScoreProgress()
-                .add(request.getScorePrep())
-                .add(request.getScoreInteraction())
-                .add(request.getScoreDiscussion())
-                .add(request.getScorePractical());
-        if (totalScore.compareTo(MAX_TOTAL_SCORE) > 0) {
-            return Result.fail("总分不能超过30分");
+        String evaluationDetails;
+        try {
+            evaluationDetails = objectMapper.writeValueAsString(request.getEvaluationItems());
+        } catch (JsonProcessingException e) {
+            return Result.fail("评价明细序列化失败");
         }
 
-        ProcessEvaluation evaluation = processEvaluationService.getOne(new LambdaQueryWrapper<ProcessEvaluation>()
+        List<ProcessEvaluation> evaluationList = processEvaluationService.list(new LambdaQueryWrapper<ProcessEvaluation>()
                 .eq(ProcessEvaluation::getUserId, request.getUserId())
-                .eq(ProcessEvaluation::getCourseId, request.getCourseId()));
+                .eq(ProcessEvaluation::getCourseId, request.getCourseId())
+                .orderByDesc(ProcessEvaluation::getId));
+        ProcessEvaluation evaluation = evaluationList.isEmpty() ? null : evaluationList.get(0);
         boolean isNew = evaluation == null;
         if (isNew) {
             evaluation = new ProcessEvaluation();
             evaluation.setUserId(request.getUserId());
             evaluation.setCourseId(request.getCourseId());
         }
-        evaluation.setScoreProgress(request.getScoreProgress());
-        evaluation.setScorePrep(request.getScorePrep());
-        evaluation.setScoreInteraction(request.getScoreInteraction());
-        evaluation.setScoreDiscussion(request.getScoreDiscussion());
-        evaluation.setScorePractical(request.getScorePractical());
+        evaluation.setEvaluationDetails(evaluationDetails);
         evaluation.setTotalScore(totalScore);
 
         boolean success = isNew ? processEvaluationService.save(evaluation) : processEvaluationService.updateById(evaluation);
@@ -79,27 +84,22 @@ public class BackendEvaluationController {
         return Result.success(result);
     }
 
-    private boolean isValidDimensionScore(BigDecimal score) {
-        return score != null
-                && score.compareTo(BigDecimal.ZERO) >= 0
-                && score.compareTo(MAX_DIMENSION_SCORE) <= 0;
-    }
-
     @Data
     public static class ScoreRequest {
         @NotNull(message = "学员ID不能为空")
         private Long userId;
         @NotNull(message = "课程ID不能为空")
         private Long courseId;
-        @NotNull(message = "进度分不能为空")
-        private BigDecimal scoreProgress;
-        @NotNull(message = "预习分不能为空")
-        private BigDecimal scorePrep;
-        @NotNull(message = "互动分不能为空")
-        private BigDecimal scoreInteraction;
-        @NotNull(message = "讨论分不能为空")
-        private BigDecimal scoreDiscussion;
-        @NotNull(message = "实操分不能为空")
-        private BigDecimal scorePractical;
+        @NotEmpty(message = "评价明细不能为空")
+        @Valid
+        private List<EvaluationItem> evaluationItems;
+    }
+
+    @Data
+    public static class EvaluationItem {
+        @NotBlank(message = "评价维度不能为空")
+        private String dimension;
+        @NotNull(message = "评价分数不能为空")
+        private BigDecimal score;
     }
 }

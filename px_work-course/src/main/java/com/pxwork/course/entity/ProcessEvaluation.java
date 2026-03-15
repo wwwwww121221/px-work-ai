@@ -26,15 +26,7 @@ public class ProcessEvaluation implements Serializable {
 
     private Long courseId;
 
-    private BigDecimal scoreProgress;
-
-    private BigDecimal scorePrep;
-
-    private BigDecimal scoreInteraction;
-
-    private BigDecimal scoreDiscussion;
-
-    private BigDecimal scorePractical;
+    private String evaluationDetails;
 
     private BigDecimal totalScore;
 
