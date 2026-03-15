@@ -30,7 +30,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pxwork.common.service.ai.DifyApiService;
-import com.pxwork.common.utils.JsonUtils;
 import com.pxwork.common.utils.Result;
 import com.pxwork.course.entity.Course;
 import com.pxwork.course.entity.Exam;
@@ -230,8 +229,10 @@ public class BackendExamController {
             Map<String, Object> inputs = new HashMap<>();
             inputs.put("job_role", jobRoleTag);
             String aiRawJson = difyApiService.runGenerateWorkflow(inputs, fileId);
-            String cleanedJson = JsonUtils.cleanMarkdownJson(aiRawJson);
-            List<Question> questions = parseAiQuestions(cleanedJson, jobRoleTag);
+            System.out.println("====== AI 原始返回数据 ======");
+            System.out.println(aiRawJson);
+            System.out.println("===========================");
+            List<Question> questions = parseAiQuestions(aiRawJson, jobRoleTag);
             if (questions.isEmpty()) {
                 return Result.fail("AI未生成有效题目");
             }
@@ -401,6 +402,135 @@ public class BackendExamController {
         return Result.success(userExamService.calculateFinalResult(userExamId));
     }
 
+    private List<Question> parseAiQuestions(String aiRawJson, String jobRoleTag) throws Exception {
+        if (!StringUtils.hasText(aiRawJson)) {
+            return List.of();
+        }
+
+        JsonNode root = objectMapper.readTree(aiRawJson);
+        String jsonText = aiRawJson;
+        if (root.isObject()) {
+            JsonNode textNode = root.get("text");
+            if (textNode == null) {
+                textNode = root.get("result");
+            }
+            if (textNode == null) {
+                textNode = root.get("output");
+            }
+            if (textNode == null) {
+                textNode = root.get("questions");
+            }
+            if (textNode != null && textNode.isTextual()) {
+                jsonText = textNode.asText();
+            } else if (root.size() == 1 && root.elements().next().isTextual()) {
+                jsonText = root.elements().next().asText();
+            }
+        }
+
+        int startList = jsonText.indexOf('[');
+        int endList = jsonText.lastIndexOf(']');
+        int startObj = jsonText.indexOf('{');
+        int endObj = jsonText.lastIndexOf('}');
+        if (startList != -1 && endList != -1 && startList < endList) {
+            jsonText = jsonText.substring(startList, endList + 1);
+        } else if (startObj != -1 && endObj != -1 && startObj < endObj) {
+            jsonText = jsonText.substring(startObj, endObj + 1);
+        }
+
+        JsonNode cleanRoot = objectMapper.readTree(jsonText);
+        List<Question> result = new ArrayList<>();
+        if (cleanRoot.isArray()) {
+            for (JsonNode node : cleanRoot) {
+                Question q = toQuestion(node, jobRoleTag);
+                if (q != null) {
+                    result.add(q);
+                }
+            }
+        } else if (cleanRoot.isObject()) {
+            JsonNode itemsNode = cleanRoot.get("questions");
+            if (itemsNode == null) {
+                itemsNode = cleanRoot.get("list");
+            }
+            if (itemsNode == null) {
+                itemsNode = cleanRoot.get("items");
+            }
+            if (itemsNode != null && itemsNode.isArray()) {
+                for (JsonNode node : itemsNode) {
+                    Question q = toQuestion(node, jobRoleTag);
+                    if (q != null) {
+                        result.add(q);
+                    }
+                }
+            } else {
+                Question q = toQuestion(cleanRoot, jobRoleTag);
+                if (q != null) {
+                    result.add(q);
+                }
+            }
+        }
+        return result;
+    }
+
+    private Question toQuestion(JsonNode node, String jobRoleTag) throws Exception {
+        if (node == null || node.isNull()) {
+            return null;
+        }
+        String content = readText(node, "content");
+        if (!StringUtils.hasText(content)) {
+            return null;
+        }
+        Question question = new Question();
+        question.setJobRoleTag(jobRoleTag);
+        question.setQuestionType(normalizeQuestionType(readText(node, "question_type", "questionType")));
+        question.setContent(content);
+        question.setStandardAnswer(readText(node, "standard_answer", "standardAnswer"));
+        question.setAnalysis(readText(node, "analysis"));
+        String categoryText = readText(node, "category_id", "categoryId");
+        if (StringUtils.hasText(categoryText)) {
+            try {
+                question.setCategoryId(Long.parseLong(categoryText));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        JsonNode optionsNode = node.get("options");
+        if (optionsNode != null && !optionsNode.isNull()) {
+            if (optionsNode.isTextual()) {
+                question.setOptions(optionsNode.asText());
+            } else {
+                question.setOptions(objectMapper.writeValueAsString(optionsNode));
+            }
+        }
+        return question;
+    }
+
+    private String normalizeQuestionType(String rawType) {
+        if (!StringUtils.hasText(rawType)) {
+            return "short_answer";
+        }
+        String type = rawType.trim().toLowerCase();
+        return switch (type) {
+            case "single_choice", "single", "单选", "单选题" -> "single_choice";
+            case "short_answer", "short", "subjective", "简答", "简答题", "主观题" -> "short_answer";
+            case "case_analysis", "case", "案例分析", "案例分析题" -> "case_analysis";
+            case "practical_application", "practical", "实操", "实操题", "实操应用题" -> "practical_application";
+            default -> type;
+        };
+    }
+
+    private String readText(JsonNode node, String... names) {
+        for (String name : names) {
+            JsonNode value = node.get(name);
+            if (value == null || value.isNull()) {
+                continue;
+            }
+            String text = value.isTextual() ? value.asText() : value.toString();
+            if (StringUtils.hasText(text)) {
+                return text;
+            }
+        }
+        return null;
+    }
+
     private Exam toExam(ExamRequest request) {
         Exam exam = new Exam();
         exam.setCourseId(request.getCourseId());
@@ -475,101 +605,4 @@ public class BackendExamController {
         private String teacherComment;
     }
 
-    private List<Question> parseAiQuestions(String cleanedJson, String jobRoleTag) throws Exception {
-        if (!StringUtils.hasText(cleanedJson)) {
-            return List.of();
-        }
-        JsonNode root = objectMapper.readTree(cleanedJson);
-        List<Question> result = new ArrayList<>();
-        if (root.isArray()) {
-            for (JsonNode node : root) {
-                Question question = toQuestion(node, jobRoleTag);
-                if (question != null) {
-                    result.add(question);
-                }
-            }
-            return result;
-        }
-        JsonNode itemsNode = root.get("questions");
-        if (itemsNode == null || !itemsNode.isArray()) {
-            itemsNode = root.get("list");
-        }
-        if (itemsNode == null || !itemsNode.isArray()) {
-            itemsNode = root.get("items");
-        }
-        if (itemsNode != null && itemsNode.isArray()) {
-            for (JsonNode node : itemsNode) {
-                Question question = toQuestion(node, jobRoleTag);
-                if (question != null) {
-                    result.add(question);
-                }
-            }
-            return result;
-        }
-        Question single = toQuestion(root, jobRoleTag);
-        if (single != null) {
-            result.add(single);
-        }
-        return result;
-    }
-
-    private Question toQuestion(JsonNode node, String jobRoleTag) throws Exception {
-        if (node == null || node.isNull()) {
-            return null;
-        }
-        String content = readText(node, "content");
-        if (!StringUtils.hasText(content)) {
-            return null;
-        }
-        Question question = new Question();
-        question.setJobRoleTag(jobRoleTag);
-        question.setQuestionType(normalizeQuestionType(readText(node, "question_type", "questionType")));
-        question.setContent(content);
-        question.setStandardAnswer(readText(node, "standard_answer", "standardAnswer"));
-        question.setAnalysis(readText(node, "analysis"));
-        String categoryText = readText(node, "category_id", "categoryId");
-        if (StringUtils.hasText(categoryText)) {
-            try {
-                question.setCategoryId(Long.parseLong(categoryText));
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        JsonNode optionsNode = node.get("options");
-        if (optionsNode != null && !optionsNode.isNull()) {
-            if (optionsNode.isTextual()) {
-                question.setOptions(optionsNode.asText());
-            } else {
-                question.setOptions(objectMapper.writeValueAsString(optionsNode));
-            }
-        }
-        return question;
-    }
-
-    private String normalizeQuestionType(String rawType) {
-        if (!StringUtils.hasText(rawType)) {
-            return "short_answer";
-        }
-        String type = rawType.trim().toLowerCase();
-        return switch (type) {
-            case "single_choice", "single", "单选", "单选题" -> "single_choice";
-            case "short_answer", "short", "subjective", "简答", "简答题", "主观题" -> "short_answer";
-            case "case_analysis", "case", "案例分析", "案例分析题" -> "case_analysis";
-            case "practical_application", "practical", "实操", "实操题", "实操应用题" -> "practical_application";
-            default -> type;
-        };
-    }
-
-    private String readText(JsonNode node, String... names) {
-        for (String name : names) {
-            JsonNode value = node.get(name);
-            if (value == null || value.isNull()) {
-                continue;
-            }
-            String text = value.isTextual() ? value.asText() : value.toString();
-            if (StringUtils.hasText(text)) {
-                return text;
-            }
-        }
-        return null;
-    }
 }

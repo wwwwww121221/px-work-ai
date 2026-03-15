@@ -23,11 +23,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pxwork.common.service.ai.DifyApiService;
 import com.pxwork.common.utils.Result;
 import com.pxwork.course.entity.Question;
+import com.pxwork.course.service.ai.AiQuestionParseUtil;
 import com.pxwork.course.service.QuestionService;
 
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -41,6 +39,9 @@ public class BackendQuestionController {
 
     @Autowired
     private DifyApiService difyApiService;
+
+    @Autowired
+    private AiQuestionParseUtil aiQuestionParseUtil;
 
     @Operation(summary = "题目分页列表")
     @GetMapping
@@ -107,29 +108,9 @@ public class BackendQuestionController {
             String fileId = difyApiService.uploadFile(file);
             Map<String, Object> inputs = Map.of("job_role", jobRoleTag);
             String aiOutputJson = difyApiService.runGenerateWorkflow(inputs, fileId);
-            List<JSONObject> aiQuestionItems = parseAiQuestionItems(aiOutputJson);
-            if (aiQuestionItems.isEmpty()) {
-                return Result.fail("AI 未生成可导入题目");
-            }
-
-            List<Question> questions = new ArrayList<>();
-            for (JSONObject item : aiQuestionItems) {
-                String content = item.getStr("content");
-                if (!StringUtils.hasText(content)) {
-                    continue;
-                }
-                Question question = new Question();
-                question.setCategoryId(categoryId);
-                question.setJobRoleTag(jobRoleTag);
-                question.setQuestionType(item.getStr("question_type"));
-                question.setContent(content);
-                question.setOptions(toJsonStringOrText(item.get("options")));
-                question.setStandardAnswer(toJsonStringOrText(item.get("standard_answer")));
-                question.setAnalysis(item.getStr("analysis"));
-                questions.add(question);
-            }
+            List<Question> questions = aiQuestionParseUtil.parseQuestions(aiOutputJson, jobRoleTag, categoryId);
             if (questions.isEmpty()) {
-                return Result.fail("AI 结果缺少有效题目内容");
+                return Result.fail("AI 未生成可导入题目");
             }
 
             boolean saved = questionService.saveBatch(questions);
@@ -159,48 +140,5 @@ public class BackendQuestionController {
             return Result.fail("题目不存在");
         }
         return Result.success(questionService.removeById(id));
-    }
-
-    private List<JSONObject> parseAiQuestionItems(String aiOutputJson) {
-        List<JSONObject> result = new ArrayList<>();
-        if (!StringUtils.hasText(aiOutputJson)) {
-            return result;
-        }
-
-        Object parsed = JSONUtil.parse(aiOutputJson);
-        if (parsed instanceof JSONArray jsonArray) {
-            for (Object item : jsonArray) {
-                result.add(JSONUtil.parseObj(item));
-            }
-            return result;
-        }
-
-        if (parsed instanceof JSONObject jsonObject) {
-            Object listNode = jsonObject.get("questions");
-            if (listNode == null) {
-                listNode = jsonObject.get("list");
-            }
-            if (listNode == null) {
-                listNode = jsonObject.get("items");
-            }
-            if (listNode instanceof JSONArray listArray) {
-                for (Object item : listArray) {
-                    result.add(JSONUtil.parseObj(item));
-                }
-                return result;
-            }
-            result.add(jsonObject);
-        }
-        return result;
-    }
-
-    private String toJsonStringOrText(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof String str) {
-            return str;
-        }
-        return JSONUtil.toJsonStr(value);
     }
 }

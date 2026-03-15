@@ -11,6 +11,7 @@ import com.pxwork.common.utils.Result;
 import com.pxwork.system.entity.AdminMenu;
 import com.pxwork.system.service.AdminMenuService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -23,6 +24,7 @@ public class AdminMenuController {
     private AdminMenuService adminMenuService;
 
     @Operation(summary = "获取系统权限菜单树", description = "获取完整菜单权限树")
+    @SaCheckPermission("system:menu:list")
     @GetMapping("/tree")
     public Result<List<AdminMenu>> tree() {
         return Result.success(adminMenuService.getMenuTree());

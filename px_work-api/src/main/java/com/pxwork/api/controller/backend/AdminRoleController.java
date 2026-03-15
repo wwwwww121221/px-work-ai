@@ -18,6 +18,7 @@ import com.pxwork.common.utils.Result;
 import com.pxwork.system.entity.AdminRole;
 import com.pxwork.system.service.AdminRoleService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -38,6 +39,7 @@ public class AdminRoleController {
     private AdminRoleService adminRoleService;
 
     @Operation(summary = "角色分页列表", description = "获取角色分页列表")
+    @SaCheckPermission("system:role:list")
     @GetMapping("/list")
     public Result<Page<AdminRole>> list(
             @RequestParam(defaultValue = "1") Integer current,
@@ -48,6 +50,7 @@ public class AdminRoleController {
     }
 
     @Operation(summary = "新增角色", description = "创建新角色")
+    @SaCheckPermission("system:role:add")
     @PostMapping("/create")
     public Result<Boolean> create(@RequestBody AdminRole adminRole) {
         boolean success = adminRoleService.save(adminRole);
@@ -55,6 +58,7 @@ public class AdminRoleController {
     }
 
     @Operation(summary = "修改角色", description = "更新角色信息")
+    @SaCheckPermission("system:role:update")
     @PutMapping("/update")
     public Result<Boolean> update(@RequestBody AdminRole adminRole) {
         boolean success = adminRoleService.updateById(adminRole);
@@ -62,6 +66,7 @@ public class AdminRoleController {
     }
 
     @Operation(summary = "删除角色", description = "根据ID删除角色")
+    @SaCheckPermission("system:role:delete")
     @DeleteMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         boolean success = adminRoleService.removeById(id);
@@ -69,12 +74,14 @@ public class AdminRoleController {
     }
 
     @Operation(summary = "获取角色已分配的权限ID集合", description = "获取角色已分配菜单ID集合")
+    @SaCheckPermission("system:role:assign")
     @GetMapping("/{roleId}/menus")
     public Result<List<Long>> roleMenus(@PathVariable Long roleId) {
         return Result.success(adminRoleService.getRoleMenuIds(roleId));
     }
 
     @Operation(summary = "为角色分配/更新权限", description = "重置并保存角色菜单关联")
+    @SaCheckPermission("system:role:assign")
     @PutMapping("/{roleId}/menus")
     public Result<Boolean> assignMenus(@PathVariable Long roleId, @RequestBody List<Long> menuIds) {
         boolean success = adminRoleService.assignMenus(roleId, menuIds);

@@ -5,23 +5,27 @@ public final class JsonUtils {
     private JsonUtils() {
     }
 
-    public static String cleanMarkdownJson(String raw) {
-        if (raw == null) {
-            return null;
+    public static String cleanMarkdownJson(String text) {
+        if (text == null || text.isBlank()) {
+            return text;
         }
-        String text = raw.trim();
-        if (text.startsWith("```")) {
-            int firstLineEnd = text.indexOf('\n');
-            if (firstLineEnd > -1) {
-                text = text.substring(firstLineEnd + 1).trim();
-            }
-            if (text.endsWith("```")) {
-                text = text.substring(0, text.length() - 3).trim();
-            }
+        int firstBrace = text.indexOf('{');
+        int firstBracket = text.indexOf('[');
+        int startIndex;
+        if (firstBrace != -1 && firstBracket != -1) {
+            startIndex = Math.min(firstBrace, firstBracket);
+        } else {
+            startIndex = Math.max(firstBrace, firstBracket);
         }
-        if (text.startsWith("`") && text.endsWith("`") && text.length() > 1) {
-            text = text.substring(1, text.length() - 1).trim();
+
+        int lastBrace = text.lastIndexOf('}');
+        int lastBracket = text.lastIndexOf(']');
+        int endIndex = Math.max(lastBrace, lastBracket);
+
+        if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
+            return text.substring(startIndex, endIndex + 1);
         }
-        return text;
+
+        return text.trim();
     }
 }

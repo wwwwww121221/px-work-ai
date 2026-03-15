@@ -18,6 +18,7 @@ import com.pxwork.common.utils.Result;
 import com.pxwork.system.entity.AdminUser;
 import com.pxwork.system.service.AdminUserService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -38,6 +39,7 @@ public class AdminUserController {
     private AdminUserService adminUserService;
 
     @Operation(summary = "管理员分页列表", description = "获取管理员分页列表")
+    @SaCheckPermission("system:admin:list")
     @GetMapping("/list")
     public Result<Page<AdminUser>> list(
             @RequestParam(defaultValue = "1") Integer current,
@@ -55,6 +57,7 @@ public class AdminUserController {
     }
 
     @Operation(summary = "新增管理员", description = "创建新管理员(支持分配角色)")
+    @SaCheckPermission("system:admin:add")
     @PostMapping("/create")
     public Result<Boolean> create(@RequestBody AdminUser adminUser) {
         boolean success = adminUserService.createAdminUser(adminUser);
@@ -62,6 +65,7 @@ public class AdminUserController {
     }
 
     @Operation(summary = "修改管理员", description = "更新管理员信息(支持分配角色)")
+    @SaCheckPermission("system:admin:update")
     @PutMapping("/update")
     public Result<Boolean> update(@RequestBody AdminUser adminUser) {
         boolean success = adminUserService.updateAdminUser(adminUser);
@@ -69,6 +73,7 @@ public class AdminUserController {
     }
 
     @Operation(summary = "删除管理员", description = "根据ID删除管理员")
+    @SaCheckPermission("system:admin:delete")
     @DeleteMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         boolean success = adminUserService.removeById(id);
