@@ -107,7 +107,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Map<String, Object> login(FrontendLoginRequest request) {
         User user = this.getOne(new LambdaQueryWrapper<User>()
-                .eq(User::getIdCard, request.getIdCard()));
+                .and(wrapper -> wrapper.eq(User::getIdCard, request.getIdCard())
+                        .or().eq(User::getEmail, request.getIdCard())));
         if (user == null) {
             throw new RuntimeException("账号或密码错误");
         }

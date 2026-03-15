@@ -6,6 +6,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pxwork.common.utils.Result;
+import com.pxwork.course.entity.CourseHour;
+import com.pxwork.course.service.CourseHourService;
 import com.pxwork.resource.entity.Resource;
 import com.pxwork.resource.service.ResourceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +36,9 @@ public class ResourceController {
 
     @Autowired
     private ResourceService resourceService;
+
+    @Autowired
+    private CourseHourService courseHourService;
 
     @Value("${app.upload-dir:D:/px/backend/uploads}")
     private String uploadDir;
@@ -88,6 +93,11 @@ public class ResourceController {
     @Operation(summary = "删除资源", description = "根据ID删除资源")
     @DeleteMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
+        long usedCount = courseHourService.count(new LambdaQueryWrapper<CourseHour>()
+                .eq(CourseHour::getResourceId, id));
+        if (usedCount > 0) {
+            return Result.fail("该素材正被课程课时引用，请先解除引用后再删除！");
+        }
         Resource resource = resourceService.getById(id);
         if (resource == null) {
             return Result.fail("资源不存在");

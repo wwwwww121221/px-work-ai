@@ -138,6 +138,7 @@ public class UserController {
             String idCard = row.getIdCard();
             String rawPassword = idCard.length() > 6 ? idCard.substring(idCard.length() - 6) : idCard;
             user.setPassword(SaSecureUtil.sha256(rawPassword));
+            user.setEmail(buildPlaceholderEmail(idCard));
             user.setIsFirstLogin(1);
             importUserMap.put(row.getIdCard(), user);
         }
@@ -159,6 +160,7 @@ public class UserController {
                 importUser.setId(exist.getId());
                 importUser.setPassword(exist.getPassword());
                 importUser.setIsFirstLogin(exist.getIsFirstLogin());
+                importUser.setEmail(org.springframework.util.StringUtils.hasText(exist.getEmail()) ? exist.getEmail() : importUser.getEmail());
                 updates.add(importUser);
             }
         }
@@ -173,5 +175,9 @@ public class UserController {
         data.put("inserted", inserts.size());
         data.put("updated", updates.size());
         return Result.success(data);
+    }
+
+    private String buildPlaceholderEmail(String idCard) {
+        return idCard + "@placeholder.local";
     }
 }

@@ -34,7 +34,7 @@ public class DifyApiService {
     private String gradeKey;
 
     public String uploadFile(MultipartFile file) {
-        try (HttpResponse response = HttpRequest.post(baseUrl + "/files/upload")
+        try (HttpResponse response = HttpRequest.post(baseUrl + "/files")
                 .header("Authorization", "Bearer " + generateKey)
                 .form("file", file.getBytes(), file.getOriginalFilename())
                 .form("user", USER)
