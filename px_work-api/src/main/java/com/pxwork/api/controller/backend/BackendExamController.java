@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -408,100 +408,99 @@ public class BackendExamController {
             return List.of();
         }
 
-        JsonNode root = objectMapper.readTree(aiRawJson);
-        String jsonText = aiRawJson;
-        if (root.isObject()) {
-            JsonNode textNode = root.get("text");
-            if (textNode == null) {
-                textNode = root.get("result");
-            }
-            if (textNode == null) {
-                textNode = root.get("output");
-            }
-            if (textNode == null) {
-                textNode = root.get("questions");
-            }
-            if (textNode != null && textNode.isTextual()) {
-                jsonText = textNode.asText();
-            } else if (root.size() == 1 && root.elements().next().isTextual()) {
-                jsonText = root.elements().next().asText();
-            }
+        String jsonText = aiRawJson.replaceAll("```json", "").replaceAll("```", "").trim();
+        jsonText = jsonText.replaceAll("\\]\\s*\\[", "],[");
+        if (jsonText.startsWith("[") && jsonText.contains("],[")) {
+            jsonText = "[" + jsonText + "]";
         }
 
         int startList = jsonText.indexOf('[');
         int endList = jsonText.lastIndexOf(']');
         int startObj = jsonText.indexOf('{');
         int endObj = jsonText.lastIndexOf('}');
-        if (startList != -1 && endList != -1 && startList < endList) {
+        if (startList != -1 && endList != -1 && (startObj == -1 || startList < startObj)) {
             jsonText = jsonText.substring(startList, endList + 1);
-        } else if (startObj != -1 && endObj != -1 && startObj < endObj) {
+        } else if (startObj != -1 && endObj != -1) {
             jsonText = jsonText.substring(startObj, endObj + 1);
         }
 
-        JsonNode cleanRoot = objectMapper.readTree(jsonText);
+        JsonNode root = objectMapper.readTree(jsonText);
+        Map<Long, Question> questionMap = new HashMap<>();
+        processJsonNode(root, questionMap, jobRoleTag);
+
         List<Question> result = new ArrayList<>();
-        if (cleanRoot.isArray()) {
-            for (JsonNode node : cleanRoot) {
-                Question q = toQuestion(node, jobRoleTag);
-                if (q != null) {
-                    result.add(q);
-                }
-            }
-        } else if (cleanRoot.isObject()) {
-            JsonNode itemsNode = cleanRoot.get("questions");
-            if (itemsNode == null) {
-                itemsNode = cleanRoot.get("list");
-            }
-            if (itemsNode == null) {
-                itemsNode = cleanRoot.get("items");
-            }
-            if (itemsNode != null && itemsNode.isArray()) {
-                for (JsonNode node : itemsNode) {
-                    Question q = toQuestion(node, jobRoleTag);
-                    if (q != null) {
-                        result.add(q);
-                    }
-                }
-            } else {
-                Question q = toQuestion(cleanRoot, jobRoleTag);
-                if (q != null) {
-                    result.add(q);
-                }
+        for (Question q : questionMap.values()) {
+            if (StringUtils.hasText(q.getContent())) {
+                result.add(q);
             }
         }
         return result;
     }
 
-    private Question toQuestion(JsonNode node, String jobRoleTag) throws Exception {
-        if (node == null || node.isNull()) {
-            return null;
-        }
-        String content = readText(node, "content");
-        if (!StringUtils.hasText(content)) {
-            return null;
-        }
-        Question question = new Question();
-        question.setJobRoleTag(jobRoleTag);
-        question.setQuestionType(normalizeQuestionType(readText(node, "question_type", "questionType")));
-        question.setContent(content);
-        question.setStandardAnswer(readText(node, "standard_answer", "standardAnswer"));
-        question.setAnalysis(readText(node, "analysis"));
-        String categoryText = readText(node, "category_id", "categoryId");
-        if (StringUtils.hasText(categoryText)) {
-            try {
-                question.setCategoryId(Long.parseLong(categoryText));
-            } catch (NumberFormatException ignored) {
+    private void processJsonNode(JsonNode node, Map<Long, Question> questionMap, String jobRoleTag) throws Exception {
+        if (node.isArray()) {
+            for (JsonNode item : node) {
+                if (item.isArray()) {
+                    processJsonNode(item, questionMap, jobRoleTag);
+                } else if (item.isObject()) {
+                    mergeToQuestion(item, questionMap, jobRoleTag);
+                }
             }
-        }
-        JsonNode optionsNode = node.get("options");
-        if (optionsNode != null && !optionsNode.isNull()) {
-            if (optionsNode.isTextual()) {
-                question.setOptions(optionsNode.asText());
+        } else if (node.isObject()) {
+            JsonNode itemsNode = node.get("questions");
+            if (itemsNode == null) {
+                itemsNode = node.get("list");
+            }
+            if (itemsNode == null) {
+                itemsNode = node.get("data");
+            }
+            if (itemsNode != null && itemsNode.isArray()) {
+                processJsonNode(itemsNode, questionMap, jobRoleTag);
             } else {
-                question.setOptions(objectMapper.writeValueAsString(optionsNode));
+                mergeToQuestion(node, questionMap, jobRoleTag);
             }
         }
-        return question;
+    }
+
+    private void mergeToQuestion(JsonNode node, Map<Long, Question> questionMap, String jobRoleTag) throws Exception {
+        if (node == null || node.isNull() || !node.isObject()) {
+            return;
+        }
+        Long id = null;
+        if (node.has("id")) {
+            id = node.get("id").asLong();
+        }
+        if (id == null || id <= 0) {
+            id = (long) (questionMap.size() + 1000);
+        }
+        Question q = questionMap.getOrDefault(id, new Question());
+        q.setJobRoleTag(jobRoleTag);
+
+        String content = readText(node, "question", "content", "title");
+        if (StringUtils.hasText(content)) {
+            q.setContent(content);
+        }
+
+        String type = readText(node, "type", "question_type", "questionType");
+        if (StringUtils.hasText(type)) {
+            q.setQuestionType(normalizeQuestionType(type));
+        }
+
+        String answer = readText(node, "answer", "standard_answer", "standardAnswer");
+        if (StringUtils.hasText(answer)) {
+            q.setStandardAnswer(answer);
+        }
+
+        String analysis = readText(node, "analysis", "explanation", "reason");
+        if (StringUtils.hasText(analysis)) {
+            q.setAnalysis(analysis);
+        }
+
+        JsonNode optionsNode = node.get("options");
+        if (optionsNode != null && !optionsNode.isNull() && !optionsNode.isEmpty()) {
+            q.setOptions(objectMapper.writeValueAsString(optionsNode));
+        }
+        questionMap.put(id, q);
     }
 
     private String normalizeQuestionType(String rawType) {

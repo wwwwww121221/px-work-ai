@@ -61,6 +61,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateUser(User user) {
+        if (StringUtils.isNotBlank(user.getPassword())) {
+            user.setPassword(SaSecureUtil.sha256(user.getPassword()));
+        } else {
+            user.setPassword(null);
+        }
         boolean updated = this.updateById(user);
         if (!updated) {
             return false;

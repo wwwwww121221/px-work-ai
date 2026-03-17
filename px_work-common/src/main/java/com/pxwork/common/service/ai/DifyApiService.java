@@ -1,9 +1,7 @@
 package com.pxwork.common.service.ai;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +32,7 @@ public class DifyApiService {
     private String gradeKey;
 
     public String uploadFile(MultipartFile file) {
-        try (HttpResponse response = HttpRequest.post(baseUrl + "/files")
+        try (HttpResponse response = HttpRequest.post(baseUrl + "/files/upload")
                 .header("Authorization", "Bearer " + generateKey)
                 .form("file", file.getBytes(), file.getOriginalFilename())
                 .form("user", USER)
@@ -77,13 +75,11 @@ public class DifyApiService {
             requestBody.put("user", USER);
 
             if (fileId != null && !fileId.isBlank()) {
-                Map<String, Object> file = new HashMap<>();
-                file.put("type", "document");
-                file.put("transfer_method", "local_file");
-                file.put("upload_file_id", fileId);
-                List<Map<String, Object>> filesList = new ArrayList<>();
-                filesList.add(file);
-                requestBody.put("files", filesList);
+                Map<String, Object> fileObj = new HashMap<>();
+                fileObj.put("type", "document");
+                fileObj.put("transfer_method", "local_file");
+                fileObj.put("upload_file_id", fileId);
+                inputs.put("file", fileObj);
             }
 
             try (HttpResponse response = HttpRequest.post(baseUrl + "/workflows/run")

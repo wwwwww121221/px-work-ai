@@ -23,9 +23,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pxwork.common.service.ai.DifyApiService;
 import com.pxwork.common.utils.Result;
+import com.pxwork.course.entity.ExamQuestion;
 import com.pxwork.course.entity.Question;
+import com.pxwork.course.entity.UserExamAnswer;
 import com.pxwork.course.service.ai.AiQuestionParseUtil;
+import com.pxwork.course.service.ExamQuestionService;
 import com.pxwork.course.service.QuestionService;
+import com.pxwork.course.service.UserExamAnswerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,6 +47,12 @@ public class BackendQuestionController {
 
     @Autowired
     private AiQuestionParseUtil aiQuestionParseUtil;
+
+    @Autowired
+    private ExamQuestionService examQuestionService;
+
+    @Autowired
+    private UserExamAnswerService userExamAnswerService;
 
     @Operation(summary = "题目分页列表")
     @GetMapping
@@ -141,6 +151,16 @@ public class BackendQuestionController {
     public Result<Boolean> delete(@PathVariable Long id) {
         if (questionService.getById(id) == null) {
             return Result.fail("题目不存在");
+        }
+        long examRefCount = examQuestionService.count(new LambdaQueryWrapper<ExamQuestion>()
+                .eq(ExamQuestion::getQuestionId, id));
+        if (examRefCount > 0) {
+            return Result.fail("该题目已被试卷引用，无法直接删除");
+        }
+        long answerRefCount = userExamAnswerService.count(new LambdaQueryWrapper<UserExamAnswer>()
+                .eq(UserExamAnswer::getQuestionId, id));
+        if (answerRefCount > 0) {
+            return Result.fail("该题目已有学员作答记录，无法直接删除");
         }
         return Result.success(questionService.removeById(id));
     }
