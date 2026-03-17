@@ -228,7 +228,7 @@ public class BackendExamController {
             @RequestParam("courseId") Long courseId,
             @RequestParam("title") String title,
             @RequestParam("jobRoleTag") String jobRoleTag,
-            @RequestParam(value = "questionConfig", defaultValue = "{\"单选\":{\"count\":5,\"score\":1}}") String questionConfigJson) {
+            @RequestParam(value = "questionConfig", defaultValue = "{\"单选\":{\"count\":5,\"score\":2}}") String questionConfigJson) {
         if (file == null || file.isEmpty()) {
             return Result.fail("课件文档不能为空");
         }
