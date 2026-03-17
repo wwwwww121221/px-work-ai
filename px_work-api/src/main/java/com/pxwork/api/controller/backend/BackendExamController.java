@@ -424,7 +424,13 @@ public class BackendExamController {
             jsonText = jsonText.substring(startObj, endObj + 1);
         }
 
-        JsonNode root = objectMapper.readTree(jsonText);
+        JsonNode root;
+        try {
+            root = objectMapper.readTree(jsonText);
+        } catch (Exception e) {
+            return List.of();
+        }
+
         Map<Long, Question> questionMap = new HashMap<>();
         processJsonNode(root, questionMap, jobRoleTag);
 
@@ -438,34 +444,49 @@ public class BackendExamController {
     }
 
     private void processJsonNode(JsonNode node, Map<Long, Question> questionMap, String jobRoleTag) throws Exception {
+        if (node == null || node.isNull()) {
+            return;
+        }
+
         if (node.isArray()) {
             for (JsonNode item : node) {
-                if (item.isArray()) {
-                    processJsonNode(item, questionMap, jobRoleTag);
-                } else if (item.isObject()) {
-                    mergeToQuestion(item, questionMap, jobRoleTag);
-                }
+                processJsonNode(item, questionMap, jobRoleTag);
             }
         } else if (node.isObject()) {
-            JsonNode itemsNode = node.get("questions");
-            if (itemsNode == null) {
-                itemsNode = node.get("list");
-            }
-            if (itemsNode == null) {
-                itemsNode = node.get("data");
-            }
-            if (itemsNode != null && itemsNode.isArray()) {
-                processJsonNode(itemsNode, questionMap, jobRoleTag);
-            } else {
+            if (node.has("question") || node.has("content") || node.has("title")
+                    || node.has("answer") || node.has("standard_answer")
+                    || node.has("analysis") || node.has("explanation") || node.has("options")) {
                 mergeToQuestion(node, questionMap, jobRoleTag);
+            }
+
+            java.util.Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> entry = fields.next();
+                String key = entry.getKey();
+                JsonNode child = entry.getValue();
+
+                if ("options".equalsIgnoreCase(key)) {
+                    continue;
+                }
+
+                if (child.isArray() || child.isObject()) {
+                    processJsonNode(child, questionMap, jobRoleTag);
+                } else if (child.isTextual()) {
+                    String text = child.asText().trim();
+                    if ((text.startsWith("[") && text.endsWith("]"))
+                            || (text.startsWith("{") && text.endsWith("}"))) {
+                        try {
+                            JsonNode parsedChild = objectMapper.readTree(text);
+                            processJsonNode(parsedChild, questionMap, jobRoleTag);
+                        } catch (Exception e) {
+                        }
+                    }
+                }
             }
         }
     }
 
     private void mergeToQuestion(JsonNode node, Map<Long, Question> questionMap, String jobRoleTag) throws Exception {
-        if (node == null || node.isNull() || !node.isObject()) {
-            return;
-        }
         Long id = null;
         if (node.has("id")) {
             id = node.get("id").asLong();
@@ -473,8 +494,12 @@ public class BackendExamController {
         if (id == null || id <= 0) {
             id = (long) (questionMap.size() + 1000);
         }
+
         Question q = questionMap.getOrDefault(id, new Question());
         q.setJobRoleTag(jobRoleTag);
+        if (q.getCategoryId() == null) {
+            q.setCategoryId(0L);
+        }
 
         String content = readText(node, "question", "content", "title");
         if (StringUtils.hasText(content)) {
@@ -484,6 +509,8 @@ public class BackendExamController {
         String type = readText(node, "type", "question_type", "questionType");
         if (StringUtils.hasText(type)) {
             q.setQuestionType(normalizeQuestionType(type));
+        } else if (q.getQuestionType() == null) {
+            q.setQuestionType("short_answer");
         }
 
         String answer = readText(node, "answer", "standard_answer", "standardAnswer");
@@ -498,8 +525,13 @@ public class BackendExamController {
 
         JsonNode optionsNode = node.get("options");
         if (optionsNode != null && !optionsNode.isNull() && !optionsNode.isEmpty()) {
-            q.setOptions(objectMapper.writeValueAsString(optionsNode));
+            if (optionsNode.isTextual()) {
+                q.setOptions(optionsNode.asText());
+            } else {
+                q.setOptions(objectMapper.writeValueAsString(optionsNode));
+            }
         }
+
         questionMap.put(id, q);
     }
 
