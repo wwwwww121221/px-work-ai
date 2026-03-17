@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pxwork.common.service.ai.DifyApiService;
@@ -156,13 +157,6 @@ public class BackendExamController {
             return Result.fail("题型抽取配置不能为空");
         }
         Course course = courseService.getById(exam.getCourseId());
-        String roleTag = null;
-        if (course != null && StringUtils.hasText(course.getTargetRoles())) {
-            String[] roles = course.getTargetRoles().split(",");
-            if (roles.length > 0 && StringUtils.hasText(roles[0])) {
-                roleTag = roles[0].trim();
-            }
-        }
 
         List<ExamQuestion> generated = new ArrayList<>();
         int sort = 1;
@@ -174,8 +168,20 @@ public class BackendExamController {
             }
             LambdaQueryWrapper<Question> queryWrapper = new LambdaQueryWrapper<Question>()
                     .eq(Question::getQuestionType, questionType);
-            if (StringUtils.hasText(roleTag)) {
-                queryWrapper.eq(Question::getJobRoleTag, roleTag);
+            if (course != null && StringUtils.hasText(course.getTargetRoles())) {
+                String[] roles = course.getTargetRoles().split(",");
+                queryWrapper.and(wrapper -> {
+                    boolean added = false;
+                    for (String role : roles) {
+                        if (StringUtils.hasText(role)) {
+                            if (added) {
+                                wrapper.or();
+                            }
+                            wrapper.apply("FIND_IN_SET({0}, job_role_tag)", role.trim());
+                            added = true;
+                        }
+                    }
+                });
             }
             List<Question> candidates = questionService.list(queryWrapper);
             if (candidates.size() < count) {
@@ -208,7 +214,8 @@ public class BackendExamController {
     public Result<Long> aiGenerate(@RequestParam("file") MultipartFile file,
             @RequestParam("courseId") Long courseId,
             @RequestParam("title") String title,
-            @RequestParam("jobRoleTag") String jobRoleTag) {
+            @RequestParam("jobRoleTag") String jobRoleTag,
+            @RequestParam(value = "questionConfig", defaultValue = "{\"单选\":5}") String questionConfigJson) {
         if (file == null || file.isEmpty()) {
             return Result.fail("课件文档不能为空");
         }
@@ -225,10 +232,28 @@ public class BackendExamController {
             return Result.fail("课程不存在");
         }
         try {
+            Map<String, Integer> configMap = objectMapper.readValue(questionConfigJson, new TypeReference<Map<String, Integer>>() {
+            });
+            if (configMap == null || configMap.isEmpty()) {
+                return Result.fail("题型数量配置不能为空");
+            }
+            StringBuilder requirementsBuilder = new StringBuilder();
+            int totalExpected = 0;
+            for (Map.Entry<String, Integer> entry : configMap.entrySet()) {
+                if (entry.getValue() != null && entry.getValue() > 0) {
+                    requirementsBuilder.append("【").append(entry.getKey()).append("】").append(entry.getValue()).append("道，");
+                    totalExpected += entry.getValue();
+                }
+            }
+            if (totalExpected == 0) {
+                return Result.fail("题目总数不能为0");
+            }
+            String questionRequirements = requirementsBuilder.toString();
+
             String fileId = difyApiService.uploadFile(file);
             Map<String, Object> inputs = new HashMap<>();
             inputs.put("job_role", jobRoleTag);
-            inputs.put("question_count", 5);
+            inputs.put("question_requirements", questionRequirements);
             String aiRawJson = difyApiService.runGenerateWorkflow(inputs, fileId);
             System.out.println("====== AI 原始返回数据 ======");
             System.out.println(aiRawJson);

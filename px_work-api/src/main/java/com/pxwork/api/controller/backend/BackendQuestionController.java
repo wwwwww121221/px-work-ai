@@ -1,6 +1,5 @@
 package com.pxwork.api.controller.backend;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +25,10 @@ import com.pxwork.common.utils.Result;
 import com.pxwork.course.entity.ExamQuestion;
 import com.pxwork.course.entity.Question;
 import com.pxwork.course.entity.UserExamAnswer;
-import com.pxwork.course.service.ai.AiQuestionParseUtil;
 import com.pxwork.course.service.ExamQuestionService;
 import com.pxwork.course.service.QuestionService;
 import com.pxwork.course.service.UserExamAnswerService;
+import com.pxwork.course.service.ai.AiQuestionParseUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,7 +72,7 @@ public class BackendQuestionController {
             queryWrapper.eq(Question::getIndustryTag, industryTag);
         }
         if (StringUtils.hasText(jobRoleTag)) {
-            queryWrapper.eq(Question::getJobRoleTag, jobRoleTag);
+            queryWrapper.apply("FIND_IN_SET({0}, job_role_tag)", jobRoleTag.trim());
         }
         if (categoryId != null && categoryId > 0) {
             queryWrapper.eq(Question::getCategoryId, categoryId);
