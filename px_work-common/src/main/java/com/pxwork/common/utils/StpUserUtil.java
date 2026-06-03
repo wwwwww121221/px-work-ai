@@ -1,6 +1,7 @@
 package com.pxwork.common.utils;
 
 import cn.dev33.satoken.stp.StpLogic;
+import cn.dev33.satoken.stp.StpUtil;
 
 /**
  * Sa-Token 权限认证工具类 (学员端专用)

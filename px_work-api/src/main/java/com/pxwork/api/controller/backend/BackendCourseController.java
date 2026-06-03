@@ -27,6 +27,7 @@ import com.pxwork.common.service.UserService;
 import com.pxwork.common.utils.Result;
 import com.pxwork.course.entity.Course;
 import com.pxwork.course.entity.CourseHour;
+import com.pxwork.course.entity.CourseResource;
 import com.pxwork.course.entity.UserCourseEnrollment;
 import com.pxwork.course.entity.UserCourseResult;
 import com.pxwork.course.service.CourseChapterService;
