@@ -26,8 +26,8 @@ import com.pxwork.common.entity.User;
 import com.pxwork.common.service.UserService;
 import com.pxwork.common.utils.Result;
 import com.pxwork.course.entity.Course;
+import com.pxwork.course.entity.CourseChapter;
 import com.pxwork.course.entity.CourseHour;
-import com.pxwork.course.entity.CourseResource;
 import com.pxwork.course.entity.UserCourseEnrollment;
 import com.pxwork.course.entity.UserCourseResult;
 import com.pxwork.course.service.CourseChapterService;
@@ -46,17 +46,9 @@ import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * <p>
- * 后台课程管理 前端控制器
- * </p>
- *
- * @author TraeAI
- * @since 2026-03-13
- */
 @Tag(name = "2.1 后台-课程建设管理")
 @RestController
-@RequestMapping({"/backend/course"})
+@RequestMapping("/backend/course")
 public class BackendCourseController {
 
     @Autowired
@@ -229,11 +221,13 @@ public class BackendCourseController {
         if (!isSuperAdmin && !currentUserId.equals(course.getTeacherId())) {
             return Result.fail("无权限查看该课程");
         }
-        java.util.LinkedHashSet<Long> resourceIds = new java.util.LinkedHashSet<>(courseResourceService.listResourceIdsByCourse(id));
-        List<Long> chapterIds = courseChapterService.list(new LambdaQueryWrapper<com.pxwork.course.entity.CourseChapter>()
-                .eq(com.pxwork.course.entity.CourseChapter::getCourseId, id))
+
+        java.util.LinkedHashSet<Long> resourceIds = new java.util.LinkedHashSet<>(
+                courseResourceService.listResourceIdsByCourse(id));
+        List<Long> chapterIds = courseChapterService.list(new LambdaQueryWrapper<CourseChapter>()
+                .eq(CourseChapter::getCourseId, id))
                 .stream()
-                .map(com.pxwork.course.entity.CourseChapter::getId)
+                .map(CourseChapter::getId)
                 .collect(Collectors.toList());
         if (!chapterIds.isEmpty()) {
             courseHourService.list(new LambdaQueryWrapper<CourseHour>()
@@ -246,11 +240,14 @@ public class BackendCourseController {
         if (resourceIds.isEmpty()) {
             return Result.success(List.of());
         }
-        List<Resource> resources = resourceService.list(new LambdaQueryWrapper<Resource>().in(Resource::getId, resourceIds));
+
+        List<Resource> resources = resourceService.list(
+                new LambdaQueryWrapper<Resource>().in(Resource::getId, resourceIds));
         Map<Long, Resource> resourceMap = new HashMap<>();
         for (Resource resource : resources) {
             resourceMap.put(resource.getId(), resource);
         }
+
         List<Resource> ordered = new ArrayList<>();
         Set<Long> seenIds = new java.util.HashSet<>();
         for (Long resourceId : resourceIds) {
@@ -284,11 +281,6 @@ public class BackendCourseController {
         return Result.success(true);
     }
 
-    private boolean isSuperAdmin(Long adminUserId) {
-        AdminUser adminUser = adminUserService.getById(adminUserId);
-        return adminUser != null && Integer.valueOf(1).equals(adminUser.getIsSuper());
-    }
-
     @Operation(summary = "获取指定课程下的所有学员及其成绩明细")
     @GetMapping("/{courseId}/student-results")
     public Result<List<Map<String, Object>>> getCourseStudentResults(@PathVariable Long courseId) {
@@ -309,17 +301,19 @@ public class BackendCourseController {
             return Result.success(new ArrayList<>());
         }
 
-        Set<Long> userIds = enrollments.stream().map(UserCourseEnrollment::getUserId).collect(Collectors.toSet());
+        Set<Long> userIds = enrollments.stream()
+                .map(UserCourseEnrollment::getUserId)
+                .collect(Collectors.toSet());
 
         List<User> users = userService.listByIds(userIds);
-        Map<Long, User> userMap = users.stream().collect(Collectors.toMap(User::getId, u -> u));
+        Map<Long, User> userMap = users.stream().collect(Collectors.toMap(User::getId, user -> user));
 
         List<UserCourseResult> results = userCourseResultService.list(
                 new LambdaQueryWrapper<UserCourseResult>()
                         .eq(UserCourseResult::getCourseId, courseId)
                         .in(UserCourseResult::getUserId, userIds));
         Map<Long, UserCourseResult> resultMap = results.stream()
-                .collect(Collectors.toMap(UserCourseResult::getUserId, r -> r));
+                .collect(Collectors.toMap(UserCourseResult::getUserId, result -> result));
 
         List<Map<String, Object>> list = new ArrayList<>();
         for (Long userId : userIds) {
@@ -347,6 +341,11 @@ public class BackendCourseController {
         }
 
         return Result.success(list);
+    }
+
+    private boolean isSuperAdmin(Long adminUserId) {
+        AdminUser adminUser = adminUserService.getById(adminUserId);
+        return adminUser != null && Integer.valueOf(1).equals(adminUser.getIsSuper());
     }
 
     private void applyWeightDefaults(Course course) {
