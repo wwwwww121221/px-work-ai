@@ -1,0 +1,32 @@
+# IDE 配置
+.vscode/
+.idea/
+
+# 编译产物
+target/
+*.class
+*.jar
+
+# 日志/缓存
+logs/
+*.log
+
+# 上传/下载目录
+uploads/
+downloads/
+
+# 环境配置
+.env
+.env.*
+toolchains.xml
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 根目录散落的旧SQL脚本（已迁移到db/目录）
+/init.sql
+/init_course.sql
+/init_resource.sql
+/migrate_schema.sql
+/update_*.sql
