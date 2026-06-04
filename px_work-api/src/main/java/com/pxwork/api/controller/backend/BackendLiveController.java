@@ -19,6 +19,7 @@ import com.pxwork.course.service.CourseHourService;
 import com.pxwork.course.service.LiveRoomService;
 import com.tencentyun.TLSSigAPIv2;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,6 +45,7 @@ public class BackendLiveController {
     private CourseHourService courseHourService;
 
     @Operation(summary = "讲师进入直播间")
+    @SaCheckPermission("course:update")
     @GetMapping("/enter/{hourId}")
     public Result<Map<String, Object>> enterLiveRoom(@PathVariable Long hourId) {
         CourseHour hour = courseHourService.getById(hourId);
@@ -66,6 +68,7 @@ public class BackendLiveController {
     }
 
     @Operation(summary = "更新直播间状态")
+    @SaCheckPermission("course:update")
     @PutMapping("/status")
     public Result<String> updateStatus(@RequestParam String roomId, @RequestParam Integer status) {
         if (status == null || (status != 1 && status != 2)) {

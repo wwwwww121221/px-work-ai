@@ -7,5 +7,6 @@ import com.pxwork.system.entity.AdminUser;
 public interface AdminUserService extends IService<AdminUser> {
     boolean createAdminUser(AdminUser adminUser);
     boolean updateAdminUser(AdminUser adminUser);
+    boolean deleteAdminUserById(Long adminUserId);
     String login(BackendLoginRequest request);
 }

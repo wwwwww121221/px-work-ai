@@ -25,6 +25,7 @@ import com.pxwork.course.service.UserCourseResultService;
 import com.pxwork.system.entity.AdminUser;
 import com.pxwork.system.service.AdminUserService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,6 +57,7 @@ public class BackendEvaluationController {
     private UserCourseResultService userCourseResultService;
 
     @Operation(summary = "过程评价打分（自动触发综合成绩汇总）")
+    @SaCheckPermission("course:update")
     @PutMapping("/score")
     public Result<Map<String, Object>> score(@RequestBody @Validated ScoreRequest request) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();

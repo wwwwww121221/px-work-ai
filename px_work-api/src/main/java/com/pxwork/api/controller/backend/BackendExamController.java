@@ -50,6 +50,7 @@ import com.pxwork.course.service.ai.AiQuestionParseUtil;
 import com.pxwork.system.entity.AdminUser;
 import com.pxwork.system.service.AdminUserService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -97,6 +98,7 @@ public class BackendExamController {
     private UserService userService;
 
     @Operation(summary = "考试分页列表")
+    @SaCheckPermission("course:query")
     @GetMapping("/exams")
     public Result<Page<Map<String, Object>>> list(
             @RequestParam(defaultValue = "1") Integer current,
@@ -161,6 +163,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "考试详情")
+    @SaCheckPermission("course:query")
     @GetMapping("/exams/{id}")
     public Result<Exam> detail(@PathVariable Long id) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();
@@ -176,6 +179,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "创建考试")
+    @SaCheckPermission("course:update")
     @PostMapping("/exams")
     public Result<Boolean> create(@RequestBody @Validated ExamRequest request) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();
@@ -192,6 +196,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "更新考试")
+    @SaCheckPermission("course:update")
     @PutMapping("/exams/{id}")
     public Result<Boolean> update(@PathVariable Long id, @RequestBody @Validated ExamRequest request) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();
@@ -216,6 +221,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "删除考试")
+    @SaCheckPermission("course:delete")
     @DeleteMapping("/exams/{id}")
     @Transactional(rollbackFor = Exception.class)
     public Result<Boolean> delete(@PathVariable Long id) {
@@ -241,6 +247,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "手动绑定试卷题目")
+    @SaCheckPermission("course:update")
     @PostMapping("/exams/{id}/bind-questions")
     public Result<Map<String, Object>> bindQuestions(@PathVariable Long id, @RequestBody List<QuestionBindItem> questionItems) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();
@@ -261,6 +268,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "传统自动组卷")
+    @SaCheckPermission("course:update")
     @PostMapping("/exams/{id}/auto-generate")
     public Result<Map<String, Object>> autoGenerate(@PathVariable Long id, @RequestBody Map<String, QuestionTypeConfig> questionConfigMap) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();
@@ -336,6 +344,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "AI一键出卷")
+    @SaCheckPermission("course:update")
     @PostMapping(value = "/exams/ai-generate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional(rollbackFor = Exception.class)
     public Result<Long> aiGenerate(@RequestParam("file") MultipartFile file,
@@ -448,6 +457,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "待批改试卷详情")
+    @SaCheckPermission("course:query")
     @GetMapping("/user-exams/{id}/grading-detail")
     public Result<Map<String, Object>> gradingDetail(@PathVariable Long id) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();
@@ -504,6 +514,7 @@ public class BackendExamController {
     @Operation(
             summary = "提交主观题最终批改结果（自动触发综合成绩汇总）",
             tags = {"3.2 后台-综合评价与成绩汇总"})
+    @SaCheckPermission("course:update")
     @PutMapping("/user-exams/{id}/subjective-grade")
     public Result<Map<String, Object>> subjectiveGrade(@PathVariable Long id, @RequestBody @Validated SubjectiveGradeRequest request) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();
@@ -562,6 +573,7 @@ public class BackendExamController {
     }
 
     @Operation(summary = "获取某场考试的所有学员成绩列表")
+    @SaCheckPermission("course:query")
     @GetMapping("/exams/{examId}/student-results")
     public Result<List<Map<String, Object>>> getExamStudentResults(@PathVariable Long examId) {
         Long currentAdminId = StpUtil.getLoginIdAsLong();

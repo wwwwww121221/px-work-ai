@@ -66,8 +66,16 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteAdminUserById(Long adminUserId) {
+        adminUserRoleService.remove(new LambdaQueryWrapper<AdminUserRole>()
+                .eq(AdminUserRole::getAdminUserId, adminUserId));
+        return this.removeById(adminUserId);
+    }
+
+    @Override
     public String login(BackendLoginRequest request) {
-        String loginAccount = StringUtils.isNotBlank(request.getAccount()) ? request.getAccount() : request.getEmail();
+        String loginAccount = request.getAccount();
         AdminUser adminUser = this.getOne(new LambdaQueryWrapper<AdminUser>()
                 .eq(AdminUser::getEmail, loginAccount));
         if (adminUser == null) {

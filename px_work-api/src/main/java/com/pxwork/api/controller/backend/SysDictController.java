@@ -19,6 +19,7 @@ import com.pxwork.common.utils.Result;
 import com.pxwork.system.entity.SysDict;
 import com.pxwork.system.service.SysDictService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -31,6 +32,7 @@ public class SysDictController {
     private SysDictService sysDictService;
 
     @Operation(summary = "字典列表", description = "根据dictType查询，按sort升序")
+    @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
     public Result<List<SysDict>> list(@RequestParam(required = false) String dictType) {
         LambdaQueryWrapper<SysDict> queryWrapper = new LambdaQueryWrapper<>();
@@ -42,6 +44,7 @@ public class SysDictController {
     }
 
     @Operation(summary = "新增字典项")
+    @SaCheckPermission("system:dict:add")
     @PostMapping("/create")
     public Result<Boolean> create(@RequestBody SysDict sysDict) {
         boolean success = sysDictService.save(sysDict);
@@ -49,6 +52,7 @@ public class SysDictController {
     }
 
     @Operation(summary = "修改字典项")
+    @SaCheckPermission("system:dict:update")
     @PutMapping("/update")
     public Result<Boolean> update(@RequestBody SysDict sysDict) {
         boolean success = sysDictService.updateById(sysDict);
@@ -56,6 +60,7 @@ public class SysDictController {
     }
 
     @Operation(summary = "删除字典项")
+    @SaCheckPermission("system:dict:delete")
     @DeleteMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         boolean success = sysDictService.removeById(id);

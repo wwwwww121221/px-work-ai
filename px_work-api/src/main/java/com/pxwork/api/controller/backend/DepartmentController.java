@@ -25,6 +25,7 @@ import com.pxwork.common.service.DepartmentService;
 import com.pxwork.common.service.UserDepartmentService;
 import com.pxwork.common.utils.Result;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -47,12 +48,14 @@ public class DepartmentController {
     private UserDepartmentService userDepartmentService;
 
     @Operation(summary = "部门树形列表", description = "获取部门树形结构")
+    @SaCheckPermission("system:dept:list")
     @GetMapping("/tree")
     public Result<List<Department>> tree() {
         return Result.success(departmentService.getTree());
     }
 
     @Operation(summary = "新增部门", description = "创建新部门")
+    @SaCheckPermission("system:dept:add")
     @PostMapping("/create")
     public Result<Boolean> create(@RequestBody Department department) {
         boolean success = departmentService.save(department);
@@ -60,6 +63,7 @@ public class DepartmentController {
     }
 
     @Operation(summary = "修改部门", description = "更新部门信息")
+    @SaCheckPermission("system:dept:update")
     @PutMapping("/update")
     public Result<Boolean> update(@RequestBody Department department) {
         boolean success = departmentService.updateById(department);
@@ -67,6 +71,7 @@ public class DepartmentController {
     }
 
     @Operation(summary = "删除部门", description = "根据ID删除部门")
+    @SaCheckPermission("system:dept:delete")
     @DeleteMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         long children = departmentService.count(new LambdaQueryWrapper<Department>().eq(Department::getParentId, id));
@@ -82,6 +87,7 @@ public class DepartmentController {
     }
 
     @Operation(summary = "批量删除部门", description = "批量删除部门(仅允许删除无子部门且无学员关联的部门)")
+    @SaCheckPermission("system:dept:delete")
     @PostMapping("/batch-delete")
     @Transactional(rollbackFor = Exception.class)
     public Result<Map<String, Object>> batchDelete(@RequestBody List<Long> ids) {
@@ -122,6 +128,7 @@ public class DepartmentController {
     }
 
     @Operation(summary = "部门排序重排", description = "按同级节点重排 sort，使展示顺序稳定(从1开始递增)")
+    @SaCheckPermission("system:dept:update")
     @PostMapping("/reindex-sort")
     @Transactional(rollbackFor = Exception.class)
     public Result<Map<String, Object>> reindexSort() {
@@ -176,6 +183,7 @@ public class DepartmentController {
     }
 
     @Operation(summary = "清理无效部门节点", description = "清理名称为空或为“/”的部门节点：子节点上提、学员关联上提/删除，然后删除无效节点")
+    @SaCheckPermission("system:dept:update")
     @PostMapping("/cleanup-invalid")
     @Transactional(rollbackFor = Exception.class)
     public Result<Map<String, Object>> cleanupInvalid() {

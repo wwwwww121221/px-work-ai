@@ -88,6 +88,62 @@ public class UploadController {
         }
     }
 
+    @Operation(summary = "批量上传文件", description = "批量上传多个文件")
+    @PostMapping(value = "/{module}/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Result<List<Resource>> batchUpload(
+            @PathVariable String module,
+            @RequestParam(value = "categoryId", required = false, defaultValue = "0") Long categoryId,
+            @RequestParam("files") MultipartFile[] files) {
+        if (files == null || files.length == 0) {
+            return Result.fail("请选择要上传的文件");
+        }
+        if (files.length > 20) {
+            return Result.fail("单次最多上传20个文件");
+        }
+
+        String subDir = "";
+        if (categoryId != null && categoryId > 0) {
+            ResourceCategory category = resourceCategoryService.getById(categoryId);
+            if (category == null) {
+                return Result.fail("分类不存在");
+            }
+            subDir = buildCategoryPath(categoryId);
+        }
+
+        List<Resource> results = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            try {
+                if (file.isEmpty()) {
+                    continue;
+                }
+                String originalFilename = file.getOriginalFilename();
+                String fileUrl = minioService.uploadFile(file, module, subDir);
+
+                Resource resource = new Resource();
+                resource.setName(originalFilename);
+                resource.setType(file.getContentType());
+                resource.setUrl(fileUrl);
+                resource.setSize(file.getSize());
+                resource.setDuration(0);
+                resource.setCategoryId(categoryId == null ? 0L : categoryId);
+
+                resourceService.save(resource);
+                results.add(resource);
+            } catch (Exception e) {
+                log.error("批量上传文件失败: {}", file.getOriginalFilename(), e);
+                errors.add(file.getOriginalFilename() + ": " + e.getMessage());
+            }
+        }
+
+        if (results.isEmpty()) {
+            return Result.fail("所有文件上传失败: " + String.join("; ", errors));
+        }
+        log.info("批量上传完成, 成功{}个, 失败{}个", results.size(), errors.size());
+        return Result.success(results);
+    }
+
     private String buildCategoryPath(Long categoryId) {
         List<String> pathParts = new ArrayList<>();
         Long currentId = categoryId;

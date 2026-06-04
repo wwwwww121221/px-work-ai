@@ -107,7 +107,7 @@ public class AdminUserController {
     @SaCheckPermission("system:admin:delete")
     @DeleteMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
-        boolean success = adminUserService.removeById(id);
+        boolean success = adminUserService.deleteAdminUserById(id);
         return success ? Result.success(true) : Result.fail("删除失败");
     }
 }

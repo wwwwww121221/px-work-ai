@@ -69,7 +69,7 @@ public class AdminRoleController {
     @SaCheckPermission("system:role:delete")
     @DeleteMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
-        boolean success = adminRoleService.removeById(id);
+        boolean success = adminRoleService.deleteRoleById(id);
         return success ? Result.success(true) : Result.fail("删除失败");
     }
 

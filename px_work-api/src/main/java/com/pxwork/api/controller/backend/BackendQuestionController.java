@@ -30,6 +30,7 @@ import com.pxwork.course.service.QuestionService;
 import com.pxwork.course.service.UserExamAnswerService;
 import com.pxwork.course.service.ai.AiQuestionParseUtil;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -54,6 +55,7 @@ public class BackendQuestionController {
     private UserExamAnswerService userExamAnswerService;
 
     @Operation(summary = "题目分页列表")
+    @SaCheckPermission("course:query")
     @GetMapping
     public Result<Page<Question>> list(
             @RequestParam(defaultValue = "1") Integer current,
@@ -88,6 +90,7 @@ public class BackendQuestionController {
     }
 
     @Operation(summary = "题目详情")
+    @SaCheckPermission("course:query")
     @GetMapping("/{id}")
     public Result<Question> detail(@PathVariable Long id) {
         Question question = questionService.getById(id);
@@ -98,6 +101,7 @@ public class BackendQuestionController {
     }
 
     @Operation(summary = "创建题目")
+    @SaCheckPermission("course:update")
     @PostMapping
     public Result<Boolean> create(@RequestBody Question question) {
         question.setQuestionType(aiQuestionParseUtil.normalizeQuestionType(question.getQuestionType()));
@@ -105,6 +109,7 @@ public class BackendQuestionController {
     }
 
     @Operation(summary = "AI 文档自动出题并入库")
+    @SaCheckPermission("course:update")
     @PostMapping(value = "/ai-generate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<Map<String, Object>> aiGenerate(@RequestParam("file") MultipartFile file,
             @RequestParam("jobRoleTag") String jobRoleTag,
@@ -141,6 +146,7 @@ public class BackendQuestionController {
     }
 
     @Operation(summary = "更新题目")
+    @SaCheckPermission("course:update")
     @PutMapping("/{id}")
     public Result<Boolean> update(@PathVariable Long id, @RequestBody Question question) {
         if (questionService.getById(id) == null) {
@@ -152,6 +158,7 @@ public class BackendQuestionController {
     }
 
     @Operation(summary = "删除题目")
+    @SaCheckPermission("course:delete")
     @DeleteMapping("/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         if (questionService.getById(id) == null) {
@@ -171,6 +178,7 @@ public class BackendQuestionController {
     }
 
     @Operation(summary = "查询指定试卷绑定的所有题目")
+    @SaCheckPermission("course:query")
     @GetMapping("/exam/{examId}")
     public Result<List<Map<String, Object>>> getQuestionsByExamId(@PathVariable Long examId) {
         List<ExamQuestion> examQuestions = examQuestionService.list(

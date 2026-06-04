@@ -7,8 +7,6 @@ public class BackendLoginRequest {
     @NotBlank(message = "账号/密码不能为空")
     private String account;
 
-    private String email;
-
     @NotBlank(message = "账号/密码不能为空")
     private String password;
 
@@ -18,14 +16,6 @@ public class BackendLoginRequest {
 
     public void setAccount(String account) {
         this.account = account;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPassword() {

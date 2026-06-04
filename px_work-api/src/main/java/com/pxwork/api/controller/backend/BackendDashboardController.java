@@ -19,6 +19,7 @@ import com.pxwork.course.entity.UserCourseEnrollment;
 import com.pxwork.course.service.CourseService;
 import com.pxwork.course.service.UserCourseEnrollmentService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -37,6 +38,7 @@ public class BackendDashboardController {
     private UserCourseEnrollmentService userCourseEnrollmentService;
 
     @Operation(summary = "控制台概览数据")
+    @SaCheckPermission("course:list")
     @GetMapping("/overview")
     public Result<Map<String, Object>> overview() {
         long totalStudents = userService.count();

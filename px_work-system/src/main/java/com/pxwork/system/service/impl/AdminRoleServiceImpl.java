@@ -16,8 +16,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pxwork.system.entity.AdminRole;
 import com.pxwork.system.entity.AdminRoleMenu;
+import com.pxwork.system.entity.AdminUserRole;
 import com.pxwork.system.mapper.AdminRoleMapper;
 import com.pxwork.system.mapper.AdminRoleMenuMapper;
+import com.pxwork.system.mapper.AdminUserRoleMapper;
 import com.pxwork.system.service.AdminRoleService;
 
 @Service
@@ -25,6 +27,9 @@ public class AdminRoleServiceImpl extends ServiceImpl<AdminRoleMapper, AdminRole
 
     @Autowired
     private AdminRoleMenuMapper adminRoleMenuMapper;
+
+    @Autowired
+    private AdminUserRoleMapper adminUserRoleMapper;
 
     @Override
     public Page<AdminRole> pageWithPermissionCount(Page<AdminRole> page, String name) {
@@ -88,5 +93,15 @@ public class AdminRoleServiceImpl extends ServiceImpl<AdminRoleMapper, AdminRole
             inserted += adminRoleMenuMapper.insert(roleMenu);
         }
         return inserted == roleMenus.size();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteRoleById(Long roleId) {
+        adminRoleMenuMapper.delete(new LambdaQueryWrapper<AdminRoleMenu>()
+                .eq(AdminRoleMenu::getRoleId, roleId));
+        adminUserRoleMapper.delete(new LambdaQueryWrapper<AdminUserRole>()
+                .eq(AdminUserRole::getRoleId, roleId));
+        return this.removeById(roleId);
     }
 }

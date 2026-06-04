@@ -36,6 +36,7 @@ import com.pxwork.common.utils.Result;
 import com.pxwork.system.entity.SysDict;
 import com.pxwork.system.service.SysDictService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,6 +65,7 @@ public class UserController {
     private UserDepartmentService userDepartmentService;
 
     @Operation(summary = "学员分页列表", description = "获取学员分页列表(单部门信息)")
+    @SaCheckPermission("system:user:list")
     @GetMapping("/list")
     public Result<Page<User>> list(
             @RequestParam(defaultValue = "1") Integer current,
@@ -75,6 +77,7 @@ public class UserController {
     }
 
     @Operation(summary = "新增学员", description = "创建新学员(仅支持绑定一个部门)")
+    @SaCheckPermission("system:user:add")
     @PostMapping("/create")
     public Result<Boolean> create(@RequestBody User user) {
         boolean success = userService.createUser(user);
@@ -82,6 +85,7 @@ public class UserController {
     }
 
     @Operation(summary = "修改学员", description = "更新学员信息(仅支持绑定一个部门)")
+    @SaCheckPermission("system:user:update")
     @PutMapping("/update")
     public Result<Boolean> update(@RequestBody User user) {
         boolean success = userService.updateUser(user);
@@ -89,6 +93,7 @@ public class UserController {
     }
 
     @Operation(summary = "删除学员", description = "根据ID删除学员")
+    @SaCheckPermission("system:user:delete")
     @DeleteMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         boolean success = userService.removeById(id);
@@ -96,6 +101,7 @@ public class UserController {
     }
 
     @Operation(summary = "批量删除学员", description = "批量删除学员(同时清理部门关联)")
+    @SaCheckPermission("system:user:delete")
     @PostMapping("/batch-delete")
     @Transactional(rollbackFor = Exception.class)
     public Result<Map<String, Object>> batchDelete(@RequestBody List<Long> ids) {
@@ -115,6 +121,7 @@ public class UserController {
     }
 
     @Operation(summary = "批量导入学员")
+    @SaCheckPermission("system:user:add")
     @PostMapping("/import")
     @Transactional(rollbackFor = Exception.class)
     public Result<Map<String, Object>> importUsers(@RequestParam("file") MultipartFile file) {

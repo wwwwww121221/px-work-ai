@@ -191,6 +191,7 @@ public class BackendCourseController {
     }
 
     @Operation(summary = "绑定课程资料")
+    @SaCheckPermission("course:update")
     @PostMapping("/{id}/bind-resources")
     public Result<Map<String, Object>> bindResources(@PathVariable Long id, @RequestBody List<Long> resourceIds) {
         Long currentUserId = StpUtil.getLoginIdAsLong();
@@ -210,6 +211,7 @@ public class BackendCourseController {
     }
 
     @Operation(summary = "获取课程资料列表")
+    @SaCheckPermission("course:query")
     @GetMapping("/{id}/resources")
     public Result<List<Resource>> resources(@PathVariable Long id) {
         Long currentUserId = StpUtil.getLoginIdAsLong();
@@ -263,6 +265,7 @@ public class BackendCourseController {
     }
 
     @Operation(summary = "解绑课程资料")
+    @SaCheckPermission("course:update")
     @DeleteMapping("/{id}/resources/{resourceId}")
     public Result<Boolean> unbindResource(@PathVariable Long id, @PathVariable Long resourceId) {
         Long currentUserId = StpUtil.getLoginIdAsLong();
@@ -282,6 +285,7 @@ public class BackendCourseController {
     }
 
     @Operation(summary = "获取指定课程下的所有学员及其成绩明细")
+    @SaCheckPermission("course:query")
     @GetMapping("/{courseId}/student-results")
     public Result<List<Map<String, Object>>> getCourseStudentResults(@PathVariable Long courseId) {
         Long currentUserId = StpUtil.getLoginIdAsLong();

@@ -44,13 +44,13 @@ springdoc:
 
 ai:
   dify:
-    base-url: ${AI_DIFY_BASE_URL:http://192.168.60.20/v1}
-    generate-key: ${AI_DIFY_GENERATE_KEY:app-noi1O8gsIKnjWV1i5Y23qMgA}
-    grade-key: ${AI_DIFY_GRADE_KEY:app-Cl0EZsgHRJQkCAUAQqc3ijqK}
+    base-url: ${AI_DIFY_BASE_URL:http://192.168.1.51:8099/v1}
+    generate-key: ${AI_DIFY_GENERATE_KEY:app-oQqcYxrLtdxuX5CoBTcDoFGg}
+    grade-key: ${AI_DIFY_GRADE_KEY:app-2YRW4daPCMB7oPc4wZ8yC1Qb}
 
 minio:
-  endpoint: ${MINIO_ENDPOINT:http://192.168.60.20:9000}
-  public-endpoint: ${MINIO_PUBLIC_ENDPOINT:${MINIO_ENDPOINT:http://192.168.60.20:9000}}
+  endpoint: ${MINIO_ENDPOINT:http://192.168.1.51:9000}
+  public-endpoint: ${MINIO_PUBLIC_ENDPOINT:${MINIO_ENDPOINT:http://192.168.1.51:9000}}
   access-key: ${MINIO_ACCESS_KEY:admin}
   secret-key: ${MINIO_SECRET_KEY:admin123456}
   bucket-name: ${MINIO_BUCKET_NAME:px-work}

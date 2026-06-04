@@ -27,6 +27,7 @@ import com.pxwork.course.service.AssignmentSubmissionService;
 import com.pxwork.course.service.CourseAssignmentService;
 import com.pxwork.course.service.CourseService;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
@@ -50,6 +51,7 @@ public class BackendAssignmentController {
     private UserService userService;
 
     @Operation(summary = "发布作业")
+    @SaCheckPermission("course:update")
     @PostMapping("/publish")
     public Result<Boolean> publish(@RequestBody @Validated PublishAssignmentRequest request) {
         Course course = courseService.getById(request.getCourseId());
@@ -66,6 +68,7 @@ public class BackendAssignmentController {
     }
 
     @Operation(summary = "批改作业")
+    @SaCheckPermission("course:update")
     @PutMapping("/grade")
     public Result<Boolean> grade(@RequestBody @Validated GradeAssignmentRequest request) {
         AssignmentSubmission submission = assignmentSubmissionService.getById(request.getSubmissionId());
@@ -79,6 +82,7 @@ public class BackendAssignmentController {
     }
 
     @Operation(summary = "获取指定课程的作业列表")
+    @SaCheckPermission("course:query")
     @GetMapping("/list/{courseId}")
     public Result<List<CourseAssignment>> listAssignments(@PathVariable Long courseId) {
         List<CourseAssignment> assignments = courseAssignmentService.list(
@@ -90,6 +94,7 @@ public class BackendAssignmentController {
     }
 
     @Operation(summary = "获取某次作业的学员提交记录")
+    @SaCheckPermission("course:query")
     @GetMapping("/{assignmentId}/submissions")
     public Result<List<Map<String, Object>>> listSubmissions(@PathVariable Long assignmentId) {
         // 1. 查出所有提交记录

@@ -17,6 +17,7 @@ import com.pxwork.common.utils.Result;
 import com.pxwork.system.entity.AdminUser;
 import com.pxwork.system.service.AdminUserService;
 
+import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,14 +30,21 @@ public class BackendLoginController {
     @Autowired
     private AdminUserService adminUserService;
 
+    @Autowired
+    private StpInterface stpInterface;
+
     @Operation(summary = "后台管理员登录")
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody @Validated BackendLoginRequest loginRequest) {
         try {
             String token = adminUserService.login(loginRequest);
+            long adminId = StpUtil.getLoginIdAsLong();
             Map<String, Object> tokenInfo = new HashMap<>();
             tokenInfo.put("tokenName", StpUtil.getTokenName());
             tokenInfo.put("tokenValue", token);
+            tokenInfo.put("adminId", adminId);
+            tokenInfo.put("roles", stpInterface.getRoleList(adminId, "login"));
+            tokenInfo.put("permissions", stpInterface.getPermissionList(adminId, "login"));
             return Result.success(tokenInfo);
         } catch (RuntimeException e) {
             return Result.fail(e.getMessage());
@@ -47,13 +55,17 @@ public class BackendLoginController {
 
     @Operation(summary = "获取当前管理员信息")
     @GetMapping("/user/info")
-    public Result<AdminUser> userInfo() {
+    public Result<Map<String, Object>> userInfo() {
         long adminId = StpUtil.getLoginIdAsLong();
         AdminUser adminUser = adminUserService.getById(adminId);
         if (adminUser != null) {
             adminUser.setPassword(null);
         }
-        return Result.success(adminUser);
+        Map<String, Object> result = new HashMap<>();
+        result.put("user", adminUser);
+        result.put("roles", stpInterface.getRoleList(adminId, "login"));
+        result.put("permissions", stpInterface.getPermissionList(adminId, "login"));
+        return Result.success(result);
     }
 
     @Operation(summary = "后台注销登录")

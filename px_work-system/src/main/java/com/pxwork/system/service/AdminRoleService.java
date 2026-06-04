@@ -13,4 +13,6 @@ public interface AdminRoleService extends IService<AdminRole> {
     List<Long> getRoleMenuIds(Long roleId);
 
     boolean assignMenus(Long roleId, List<Long> menuIds);
+
+    boolean deleteRoleById(Long roleId);
 }
