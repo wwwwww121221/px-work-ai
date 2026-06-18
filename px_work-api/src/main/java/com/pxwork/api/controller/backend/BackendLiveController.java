@@ -2,8 +2,8 @@ package com.pxwork.api.controller.backend;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "2.6 后台-直播管理")
 @RestController
 @RequestMapping("/backend/live")
+@RequiredArgsConstructor
 public class BackendLiveController {
 
     @Value("${trtc.appid}")
@@ -38,11 +39,9 @@ public class BackendLiveController {
     @Value("${trtc.expire-time:86400}")
     private long expireTime;
 
-    @Autowired
-    private LiveRoomService liveRoomService;
+    private final LiveRoomService liveRoomService;
 
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
 
     @Operation(summary = "讲师进入直播间")
     @SaCheckPermission("course:update")

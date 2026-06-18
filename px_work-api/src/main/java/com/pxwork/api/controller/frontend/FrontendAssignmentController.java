@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,13 +31,12 @@ import lombok.Data;
 @Tag(name = "4.4 前台-作业中心")
 @RestController
 @RequestMapping("/frontend/assignment")
+@RequiredArgsConstructor
 public class FrontendAssignmentController {
 
-    @Autowired
-    private CourseAssignmentService courseAssignmentService;
+    private final CourseAssignmentService courseAssignmentService;
 
-    @Autowired
-    private AssignmentSubmissionService assignmentSubmissionService;
+    private final AssignmentSubmissionService assignmentSubmissionService;
 
     @Operation(summary = "课程作业列表")
     @GetMapping("/list/{courseId}")

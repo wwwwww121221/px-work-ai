@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,16 +27,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "4.1 前台-学习看板")
 @RestController
 @RequestMapping("/frontend/dashboard")
+@RequiredArgsConstructor
 public class FrontendDashboardController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Autowired
-    private UserCourseResultService userCourseResultService;
+    private final UserCourseResultService userCourseResultService;
 
     @Operation(summary = "学习进度统计")
     @GetMapping("/progress-stats")

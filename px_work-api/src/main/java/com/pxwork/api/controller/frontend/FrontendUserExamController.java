@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -49,28 +49,22 @@ import lombok.Data;
 @Tag(name = "4.6 前台-考试作答")
 @RestController
 @RequestMapping("/frontend/user-exams")
+@RequiredArgsConstructor
 public class FrontendUserExamController {
 
-    @Autowired
-    private ExamService examService;
+    private final ExamService examService;
 
-    @Autowired
-    private UserExamService userExamService;
+    private final UserExamService userExamService;
 
-    @Autowired
-    private UserCourseEnrollmentService userCourseEnrollmentService;
+    private final UserCourseEnrollmentService userCourseEnrollmentService;
 
-    @Autowired
-    private ExamQuestionService examQuestionService;
+    private final ExamQuestionService examQuestionService;
 
-    @Autowired
-    private QuestionService questionService;
+    private final QuestionService questionService;
 
-    @Autowired
-    private UserExamAnswerService userExamAnswerService;
+    private final UserExamAnswerService userExamAnswerService;
 
-    @Autowired
-    private AsyncAiGradingService asyncAiGradingService;
+    private final AsyncAiGradingService asyncAiGradingService;
 
     @Operation(summary = "开始考试")
     @PostMapping

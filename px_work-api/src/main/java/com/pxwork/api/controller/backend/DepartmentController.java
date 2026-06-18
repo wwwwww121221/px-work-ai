@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,12 +40,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "1.3 后台-部门组织管理")
 @RestController
 @RequestMapping("/department")
+@RequiredArgsConstructor
 public class DepartmentController {
 
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private UserDepartmentService userDepartmentService;
+    private final DepartmentService departmentService;
+    private final UserDepartmentService userDepartmentService;
 
     @Operation(summary = "部门树形列表", description = "获取部门树形结构")
     @SaCheckPermission("system:dept:list")

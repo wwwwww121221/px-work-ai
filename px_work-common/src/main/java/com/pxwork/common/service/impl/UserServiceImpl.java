@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,14 +37,13 @@ import cn.dev33.satoken.secure.SaSecureUtil;
  * @since 2026-03-13
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     private static final String DEFAULT_FRONTEND_USER_PASSWORD = "123456";
 
-    @Autowired
-    private UserDepartmentService userDepartmentService;
+    private final UserDepartmentService userDepartmentService;
     
-    @Autowired
-    private DepartmentService departmentService;
+    private final DepartmentService departmentService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

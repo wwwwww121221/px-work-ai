@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -17,12 +17,12 @@ import com.pxwork.common.utils.JsonUtils;
 import com.pxwork.course.entity.Question;
 
 @Component
+@RequiredArgsConstructor
 public class AiQuestionParseUtil {
 
     private static final Logger log = LoggerFactory.getLogger(AiQuestionParseUtil.class);
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public List<Question> parseQuestions(String aiRawJson, String jobRoleTag, Long defaultCourseId) throws Exception {
         String cleanedJson = JsonUtils.cleanMarkdownJson(aiRawJson);

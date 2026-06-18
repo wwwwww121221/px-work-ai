@@ -8,8 +8,8 @@ import com.pxwork.course.entity.LiveRoom;
 import com.pxwork.course.mapper.LiveRoomMapper;
 import com.pxwork.course.service.CourseHourService;
 import com.pxwork.course.service.LiveRoomService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,12 +18,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class LiveRoomServiceImpl extends ServiceImpl<LiveRoomMapper, LiveRoom> implements LiveRoomService {
 
     private static final Pattern ROOM_HOUR_PATTERN = Pattern.compile("room_hour_(\\d+)");
 
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
 
     @Override
     public LiveRoom getOrCreateRoom(Long hourId, String hourName) {

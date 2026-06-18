@@ -1,8 +1,8 @@
 package com.pxwork.api.controller.resource;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,13 +33,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "2.5 后台-素材资源管理")
 @RestController
 @RequestMapping("/resource-category")
+@RequiredArgsConstructor
 public class ResourceCategoryController {
 
-    @Autowired
-    private ResourceCategoryService resourceCategoryService;
+    private final ResourceCategoryService resourceCategoryService;
 
-    @Autowired
-    private ResourceService resourceService;
+    private final ResourceService resourceService;
 
     @Operation(summary = "获取分类树", description = "获取资源分类的树形结构")
     @GetMapping("/tree")

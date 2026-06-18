@@ -6,8 +6,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +31,7 @@ import com.pxwork.course.service.UserCourseEnrollmentService;
 import com.pxwork.course.service.UserCourseResultService;
 
 @Service
+@RequiredArgsConstructor
 public class UserCourseResultServiceImpl extends ServiceImpl<UserCourseResultMapper, UserCourseResult>
         implements UserCourseResultService {
 
@@ -40,26 +41,19 @@ public class UserCourseResultServiceImpl extends ServiceImpl<UserCourseResultMap
     private static final BigDecimal DEFAULT_PASS_SCORE = new BigDecimal("60");
     private static final BigDecimal HUNDRED = new BigDecimal("100");
 
-    @Autowired
-    private UserExamMapper userExamMapper;
+    private final UserExamMapper userExamMapper;
 
-    @Autowired
-    private ProcessEvaluationService processEvaluationService;
+    private final ProcessEvaluationService processEvaluationService;
 
-    @Autowired
-    private PracticalEvaluationService practicalEvaluationService;
+    private final PracticalEvaluationService practicalEvaluationService;
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Autowired
-    private CertificateService certificateService;
+    private final CertificateService certificateService;
 
-    @Autowired
-    private UserCourseEnrollmentService userCourseEnrollmentService;
+    private final UserCourseEnrollmentService userCourseEnrollmentService;
 
-    @Autowired
-    private ExamQuestionService examQuestionService;
+    private final ExamQuestionService examQuestionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

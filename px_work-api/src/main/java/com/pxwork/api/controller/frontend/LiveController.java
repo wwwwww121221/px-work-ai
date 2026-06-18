@@ -2,8 +2,8 @@ package com.pxwork.api.controller.frontend;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "5.1 前台-直播模块")
 @RestController
 @RequestMapping("/frontend/live")
+@RequiredArgsConstructor
 public class LiveController {
 
     // 读取配置
@@ -37,12 +38,10 @@ public class LiveController {
     private long expireTime;
 
     // 🔴 引入咱们刚刚建好的直播间大管家
-    @Autowired
-    private LiveRoomService liveRoomService;
+    private final LiveRoomService liveRoomService;
 
     // 引入课时服务（为了查课时的名字）
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
 
     @Operation(summary = "进入直播间大礼包(获取房间号+门票)")
     // 🔴 接口地址改了，现在需要传入具体的课时ID

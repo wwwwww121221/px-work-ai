@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -62,40 +62,30 @@ import jakarta.validation.constraints.NotNull;
 @Tag(name = "3.4 后台-试卷与考试管理")
 @RestController
 @RequestMapping("/backend")
+@RequiredArgsConstructor
 public class BackendExamController {
 
-    @Autowired
-    private ExamService examService;
+    private final ExamService examService;
 
-    @Autowired
-    private ExamQuestionService examQuestionService;
+    private final ExamQuestionService examQuestionService;
 
-    @Autowired
-    private QuestionService questionService;
+    private final QuestionService questionService;
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Autowired
-    private UserExamService userExamService;
+    private final UserExamService userExamService;
 
-    @Autowired
-    private UserExamAnswerService userExamAnswerService;
+    private final UserExamAnswerService userExamAnswerService;
 
-    @Autowired
-    private DifyApiService difyApiService;
+    private final DifyApiService difyApiService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private AdminUserService adminUserService;
+    private final AdminUserService adminUserService;
 
-    @Autowired
-    private AiQuestionParseUtil aiQuestionParseUtil;
+    private final AiQuestionParseUtil aiQuestionParseUtil;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Operation(summary = "考试分页列表")
     @SaCheckPermission("course:query")

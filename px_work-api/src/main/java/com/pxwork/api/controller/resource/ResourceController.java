@@ -1,6 +1,7 @@
 package com.pxwork.api.controller.resource;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -29,18 +29,16 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "2.5 后台-素材资源管理")
 @RestController
 @RequestMapping("/resource")
+@RequiredArgsConstructor
 public class ResourceController {
 
     private static final Logger log = LoggerFactory.getLogger(ResourceController.class);
 
-    @Autowired
-    private ResourceService resourceService;
+    private final ResourceService resourceService;
 
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
 
-    @Autowired
-    private MinioService minioService;
+    private final MinioService minioService;
 
     @Operation(summary = "资源分页列表", description = "获取资源分页列表")
     @GetMapping("/list")

@@ -1,8 +1,8 @@
 package com.pxwork.api.controller.callback;
 
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +17,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "6.0 回调-TRTC")
 @RestController
 @RequestMapping("/api/callback/trtc")
+@RequiredArgsConstructor
 public class TrtcCallbackController {
 
-    @Autowired
-    private LiveRoomService liveRoomService;
+    private final LiveRoomService liveRoomService;
 
     @Operation(summary = "腾讯云录制回调")
     @PostMapping("/record")

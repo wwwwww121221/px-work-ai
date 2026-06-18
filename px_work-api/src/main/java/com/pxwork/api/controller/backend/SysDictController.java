@@ -1,8 +1,8 @@
 package com.pxwork.api.controller.backend;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +26,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "1.4 后台-数据字典管理")
 @RestController
 @RequestMapping("/backend/dict")
+@RequiredArgsConstructor
 public class SysDictController {
 
-    @Autowired
-    private SysDictService sysDictService;
+    private final SysDictService sysDictService;
 
     @Operation(summary = "字典列表", description = "根据dictType查询，按sort升序")
     @SaCheckPermission("system:dict:list")

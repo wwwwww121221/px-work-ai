@@ -5,8 +5,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -26,22 +26,18 @@ import com.pxwork.system.service.AdminUserService;
 import cn.dev33.satoken.stp.StpInterface;
 
 @Component
+@RequiredArgsConstructor
 public class StpInterfaceImpl implements StpInterface {
 
-    @Autowired
-    private AdminUserRoleService adminUserRoleService;
+    private final AdminUserRoleService adminUserRoleService;
 
-    @Autowired
-    private AdminRoleMenuService adminRoleMenuService;
+    private final AdminRoleMenuService adminRoleMenuService;
 
-    @Autowired
-    private AdminMenuService adminMenuService;
+    private final AdminMenuService adminMenuService;
 
-    @Autowired
-    private AdminUserService adminUserService;
+    private final AdminUserService adminUserService;
 
-    @Autowired
-    private AdminRoleService adminRoleService;
+    private final AdminRoleService adminRoleService;
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {

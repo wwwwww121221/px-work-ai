@@ -1,8 +1,8 @@
 package com.pxwork.api.controller.course;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +26,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "2.2 后台-课程分类管理")
 @RestController
 @RequestMapping("/course/category")
+@RequiredArgsConstructor
 public class CourseCategoryController {
 
-    @Autowired
-    private CourseCategoryService courseCategoryService;
-    @Autowired
-    private CourseService courseService;
+    private final CourseCategoryService courseCategoryService;
+    private final CourseService courseService;
 
     @Operation(summary = "获取分类树形结构")
     @GetMapping("/tree")

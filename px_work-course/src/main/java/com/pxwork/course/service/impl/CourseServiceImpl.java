@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,37 +36,28 @@ import com.pxwork.course.service.QuestionService;
 import com.pxwork.course.service.UserCourseEnrollmentService;
 
 @Service
+@RequiredArgsConstructor
 public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> implements CourseService {
 
-    @Autowired
-    private CourseChapterService courseChapterService;
+    private final CourseChapterService courseChapterService;
 
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
 
-    @Autowired
-    private UserCourseEnrollmentService userCourseEnrollmentService;
+    private final UserCourseEnrollmentService userCourseEnrollmentService;
 
-    @Autowired
-    private ExamService examService;
+    private final ExamService examService;
 
-    @Autowired
-    private QuestionService questionService;
+    private final QuestionService questionService;
 
-    @Autowired
-    private CourseResourceMapper courseResourceMapper;
+    private final CourseResourceMapper courseResourceMapper;
 
-    @Autowired
-    private CourseAssignmentService courseAssignmentService;
+    private final CourseAssignmentService courseAssignmentService;
 
-    @Autowired
-    private OfflineSignSessionService offlineSignSessionService;
+    private final OfflineSignSessionService offlineSignSessionService;
 
-    @Autowired
-    private OfflineSignSessionDepartmentService offlineSignSessionDepartmentService;
+    private final OfflineSignSessionDepartmentService offlineSignSessionDepartmentService;
 
-    @Autowired
-    private OfflineAttendanceService offlineAttendanceService;
+    private final OfflineAttendanceService offlineAttendanceService;
 
     @Override
     public Course getCourseDetails(Long courseId) {

@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,16 +33,14 @@ import lombok.Data;
 @Tag(name = "3.5 后台-证书管理")
 @RestController
 @RequestMapping("/backend/certificates")
+@RequiredArgsConstructor
 public class BackendCertificateController {
 
-    @Autowired
-    private CertificateService certificateService;
+    private final CertificateService certificateService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
     @Operation(summary = "管理端证书分页列表")
     @SaCheckPermission("certificate:update")

@@ -1,8 +1,8 @@
 package com.pxwork.api.controller.preview;
 
 import java.io.InputStream;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -18,10 +18,10 @@ import com.pxwork.api.service.PdfPreviewService.PreviewFile;
 
 @RestController
 @RequestMapping("/preview")
+@RequiredArgsConstructor
 public class PreviewController {
 
-    @Autowired
-    private PdfPreviewService pdfPreviewService;
+    private final PdfPreviewService pdfPreviewService;
 
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> pdf(

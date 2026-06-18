@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,26 +56,18 @@ import lombok.Data;
 @Tag(name = "2.7 后台-线下签到管理")
 @RestController
 @RequestMapping("/backend/course")
+@RequiredArgsConstructor
 public class BackendOfflineSignController {
 
-    @Autowired
-    private CourseService courseService;
-    @Autowired
-    private OfflineSignSessionService offlineSignSessionService;
-    @Autowired
-    private OfflineSignSessionDepartmentService offlineSignSessionDepartmentService;
-    @Autowired
-    private OfflineAttendanceService offlineAttendanceService;
-    @Autowired
-    private UserCourseEnrollmentService userCourseEnrollmentService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserDepartmentService userDepartmentService;
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private AdminUserService adminUserService;
+    private final CourseService courseService;
+    private final OfflineSignSessionService offlineSignSessionService;
+    private final OfflineSignSessionDepartmentService offlineSignSessionDepartmentService;
+    private final OfflineAttendanceService offlineAttendanceService;
+    private final UserCourseEnrollmentService userCourseEnrollmentService;
+    private final UserService userService;
+    private final UserDepartmentService userDepartmentService;
+    private final DepartmentService departmentService;
+    private final AdminUserService adminUserService;
 
     @Operation(summary = "获取课程线下签到场次列表")
     @SaCheckPermission("course:query")

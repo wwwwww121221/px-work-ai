@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,14 +34,12 @@ import lombok.Data;
 @Tag(name = "4.3 前台-学习进度与校验")
 @RestController
 @RequestMapping("/frontend/progress")
+@RequiredArgsConstructor
 public class FrontendProgressController {
 
-    @Autowired
-    private CourseHourRecordService courseHourRecordService;
-    @Autowired
-    private CourseChapterService courseChapterService;
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourRecordService courseHourRecordService;
+    private final CourseChapterService courseChapterService;
+    private final CourseHourService courseHourService;
 
     @Operation(summary = "上报学习进度")
     @PutMapping("/report")

@@ -1,8 +1,8 @@
 package com.pxwork.api.controller.backend;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,10 +18,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "1.2 后台-角色与权限管理")
 @RestController
 @RequestMapping("/admin-menu")
+@RequiredArgsConstructor
 public class AdminMenuController {
 
-    @Autowired
-    private AdminMenuService adminMenuService;
+    private final AdminMenuService adminMenuService;
 
     @Operation(summary = "获取系统权限菜单树", description = "获取完整菜单权限树")
     @SaCheckPermission("system:menu:list")

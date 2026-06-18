@@ -10,17 +10,17 @@ import java.security.MessageDigest;
 import java.util.HexFormat;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pxwork.common.service.MinioService;
 
 @Service
+@RequiredArgsConstructor
 public class PdfPreviewService {
 
-    @Autowired
-    private MinioService minioService;
+    private final MinioService minioService;
 
     public PreviewFile getPdfPreview(String fileUrl, String preferredName) {
         if (fileUrl == null || fileUrl.isBlank()) {

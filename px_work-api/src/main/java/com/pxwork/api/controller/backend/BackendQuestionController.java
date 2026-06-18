@@ -3,8 +3,8 @@ package com.pxwork.api.controller.backend;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,22 +37,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "3.3 后台-题库管理")
 @RestController
 @RequestMapping("/backend/questions")
+@RequiredArgsConstructor
 public class BackendQuestionController {
 
-    @Autowired
-    private QuestionService questionService;
+    private final QuestionService questionService;
 
-    @Autowired
-    private DifyApiService difyApiService;
+    private final DifyApiService difyApiService;
 
-    @Autowired
-    private AiQuestionParseUtil aiQuestionParseUtil;
+    private final AiQuestionParseUtil aiQuestionParseUtil;
 
-    @Autowired
-    private ExamQuestionService examQuestionService;
+    private final ExamQuestionService examQuestionService;
 
-    @Autowired
-    private UserExamAnswerService userExamAnswerService;
+    private final UserExamAnswerService userExamAnswerService;
 
     @Operation(summary = "题目分页列表")
     @SaCheckPermission("course:query")

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,7 +39,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
+import lombok.RequiredArgsConstructor;
 /**
  * <p>
  * 学员管理 前端控制器
@@ -52,17 +51,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "1.5 后台-学员信息管理")
 @RestController
 @RequestMapping("/backend/user")
+@RequiredArgsConstructor
 public class UserController {
     private static final String DEFAULT_FRONTEND_USER_PASSWORD = "123456";
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private SysDictService sysDictService;
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private UserDepartmentService userDepartmentService;
+    private final UserService userService;
+    private final SysDictService sysDictService;
+    private final DepartmentService departmentService;
+    private final UserDepartmentService userDepartmentService;
 
     @Operation(summary = "学员分页列表", description = "获取学员分页列表(单部门信息)")
     @SaCheckPermission("system:user:list")

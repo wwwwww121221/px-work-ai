@@ -3,8 +3,8 @@ package com.pxwork.api.controller.frontend;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +29,10 @@ import lombok.Data;
 @Tag(name = "4.0 前台-学员登录认证")
 @RestController
 @RequestMapping("/frontend")
+@RequiredArgsConstructor
 public class FrontendLoginController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Operation(summary = "学员登录")
     @PostMapping("/login")

@@ -6,18 +6,18 @@ import com.pxwork.course.entity.CourseChapter;
 import com.pxwork.course.service.CourseChapterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Tag(name = "2.3 后台-课程章节管理")
 @RestController
 @RequestMapping("/course/chapter")
+@RequiredArgsConstructor
 public class CourseChapterController {
 
-    @Autowired
-    private CourseChapterService courseChapterService;
+    private final CourseChapterService courseChapterService;
 
     @Operation(summary = "获取课程章节列表")
     @GetMapping("/list")

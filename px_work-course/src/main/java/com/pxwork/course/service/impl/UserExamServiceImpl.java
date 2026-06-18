@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,13 +18,12 @@ import com.pxwork.course.service.UserCourseResultService;
 import com.pxwork.course.service.UserExamService;
 
 @Service
+@RequiredArgsConstructor
 public class UserExamServiceImpl extends ServiceImpl<UserExamMapper, UserExam> implements UserExamService {
 
-    @Autowired
-    private ExamService examService;
+    private final ExamService examService;
 
-    @Autowired
-    private UserCourseResultService userCourseResultService;
+    private final UserCourseResultService userCourseResultService;
 
     @Override
     public Map<String, Object> calculateFinalResult(Long userExamId) {

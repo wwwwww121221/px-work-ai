@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,16 +26,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "1.1 后台-控制台概览")
 @RestController
 @RequestMapping("/backend/dashboard")
+@RequiredArgsConstructor
 public class BackendDashboardController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Autowired
-    private UserCourseEnrollmentService userCourseEnrollmentService;
+    private final UserCourseEnrollmentService userCourseEnrollmentService;
 
     @Operation(summary = "控制台概览数据")
     @SaCheckPermission("course:list")

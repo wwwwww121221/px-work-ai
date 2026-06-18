@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,34 +49,26 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "2.1 后台-课程建设管理")
 @RestController
 @RequestMapping("/backend/course")
+@RequiredArgsConstructor
 public class BackendCourseController {
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Autowired
-    private CourseChapterService courseChapterService;
+    private final CourseChapterService courseChapterService;
 
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
 
-    @Autowired
-    private CourseResourceService courseResourceService;
+    private final CourseResourceService courseResourceService;
 
-    @Autowired
-    private ResourceService resourceService;
+    private final ResourceService resourceService;
 
-    @Autowired
-    private AdminUserService adminUserService;
+    private final AdminUserService adminUserService;
 
-    @Autowired
-    private UserCourseEnrollmentService userCourseEnrollmentService;
+    private final UserCourseEnrollmentService userCourseEnrollmentService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private UserCourseResultService userCourseResultService;
+    private final UserCourseResultService userCourseResultService;
 
     @Operation(summary = "课程分页列表", description = "获取所有课程，可根据名称或分类筛选")
     @SaCheckPermission("course:list")

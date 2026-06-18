@@ -1,8 +1,8 @@
 package com.pxwork.api.controller.backend;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,10 +33,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "1.2 后台-角色与权限管理")
 @RestController
 @RequestMapping("/admin-role")
+@RequiredArgsConstructor
 public class AdminRoleController {
 
-    @Autowired
-    private AdminRoleService adminRoleService;
+    private final AdminRoleService adminRoleService;
 
     @Operation(summary = "角色分页列表", description = "获取角色分页列表")
     @SaCheckPermission("system:role:list")

@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,22 +33,18 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AsyncAiGradingService {
 
-    @Autowired
-    private UserExamAnswerService userExamAnswerService;
+    private final UserExamAnswerService userExamAnswerService;
 
-    @Autowired
-    private QuestionService questionService;
+    private final QuestionService questionService;
 
-    @Autowired
-    private UserExamService userExamService;
+    private final UserExamService userExamService;
 
-    @Autowired
-    private ExamQuestionService examQuestionService;
+    private final ExamQuestionService examQuestionService;
 
-    @Autowired
-    private DifyApiService difyApiService;
+    private final DifyApiService difyApiService;
 
     @Async
     @Transactional(rollbackFor = Exception.class)

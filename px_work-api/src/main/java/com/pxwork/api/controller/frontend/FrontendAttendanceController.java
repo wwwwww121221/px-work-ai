@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,22 +46,16 @@ import lombok.Data;
 @Tag(name = "4.5 前台-线下签到")
 @RestController
 @RequestMapping("/frontend/attendance")
+@RequiredArgsConstructor
 public class FrontendAttendanceController {
 
-    @Autowired
-    private CourseService courseService;
-    @Autowired
-    private OfflineAttendanceService offlineAttendanceService;
-    @Autowired
-    private OfflineSignSessionService offlineSignSessionService;
-    @Autowired
-    private OfflineSignSessionDepartmentService offlineSignSessionDepartmentService;
-    @Autowired
-    private UserCourseEnrollmentService userCourseEnrollmentService;
-    @Autowired
-    private UserDepartmentService userDepartmentService;
-    @Autowired
-    private DepartmentService departmentService;
+    private final CourseService courseService;
+    private final OfflineAttendanceService offlineAttendanceService;
+    private final OfflineSignSessionService offlineSignSessionService;
+    private final OfflineSignSessionDepartmentService offlineSignSessionDepartmentService;
+    private final UserCourseEnrollmentService userCourseEnrollmentService;
+    private final UserDepartmentService userDepartmentService;
+    private final DepartmentService departmentService;
 
     @Operation(summary = "获取当前课程可签到场次")
     @GetMapping("/course/{courseId}/sessions")

@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,19 +36,16 @@ import lombok.Data;
 @Tag(name = "4.7 前台-证书与公示")
 @RestController
 @RequestMapping("/frontend/certificates")
+@RequiredArgsConstructor
 public class FrontendCertificateController {
 
-    @Autowired
-    private CertificateService certificateService;
+    private final CertificateService certificateService;
 
-    @Autowired
-    private CertificateRequestService certificateRequestService;
+    private final CertificateRequestService certificateRequestService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
     @Operation(summary = "证书公示名单")
     @GetMapping("/public")

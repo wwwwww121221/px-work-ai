@@ -7,9 +7,9 @@ import com.pxwork.course.entity.CourseResource;
 import com.pxwork.course.mapper.CourseResourceMapper;
 import com.pxwork.course.service.CourseResourceService;
 import com.pxwork.course.service.CourseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,10 +20,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CourseResourceServiceImpl extends ServiceImpl<CourseResourceMapper, CourseResource> implements CourseResourceService {
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

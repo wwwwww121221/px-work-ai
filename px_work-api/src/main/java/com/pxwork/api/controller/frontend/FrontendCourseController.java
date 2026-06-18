@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,34 +43,26 @@ import lombok.Data;
 @Tag(name = "4.2 前台-选课与课程大厅")
 @RestController
 @RequestMapping("/frontend/course")
+@RequiredArgsConstructor
 public class FrontendCourseController {
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Autowired
-    private UserCourseEnrollmentService userCourseEnrollmentService;
+    private final UserCourseEnrollmentService userCourseEnrollmentService;
 
-    @Autowired
-    private CourseChapterService courseChapterService;
+    private final CourseChapterService courseChapterService;
     
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
     
-    @Autowired
-    private CourseResourceService courseResourceService;
+    private final CourseResourceService courseResourceService;
     
-    @Autowired
-    private ExamService examService;
+    private final ExamService examService;
 
-    @Autowired
-    private UserCourseResultService userCourseResultService;
+    private final UserCourseResultService userCourseResultService;
 
-    @Autowired
-    private CertificateService certificateService;
+    private final CertificateService certificateService;
 
-    @Autowired
-    private ResourceService resourceService;
+    private final ResourceService resourceService;
 
     @Operation(summary = "获取已发布课程列表", description = "获取所有已发布且对学员可见的课程列表")
     @GetMapping("/list")

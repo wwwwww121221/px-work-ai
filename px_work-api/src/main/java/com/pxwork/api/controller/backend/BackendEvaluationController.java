@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,22 +39,18 @@ import org.springframework.util.CollectionUtils;
 @Tag(name = "3.2 后台-综合评价与成绩汇总")
 @RestController
 @RequestMapping("/backend/evaluation")
+@RequiredArgsConstructor
 public class BackendEvaluationController {
 
-    @Autowired
-    private ProcessEvaluationService processEvaluationService;
+    private final ProcessEvaluationService processEvaluationService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Autowired
-    private AdminUserService adminUserService;
+    private final AdminUserService adminUserService;
 
-    @Autowired
-    private UserCourseResultService userCourseResultService;
+    private final UserCourseResultService userCourseResultService;
 
     @Operation(summary = "过程评价打分（自动触发综合成绩汇总）")
     @SaCheckPermission("course:update")

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,19 +36,16 @@ import lombok.Data;
 @Tag(name = "3.1 后台-作业管理")
 @RestController
 @RequestMapping("/backend/assignment")
+@RequiredArgsConstructor
 public class BackendAssignmentController {
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Autowired
-    private CourseAssignmentService courseAssignmentService;
+    private final CourseAssignmentService courseAssignmentService;
 
-    @Autowired
-    private AssignmentSubmissionService assignmentSubmissionService;
+    private final AssignmentSubmissionService assignmentSubmissionService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Operation(summary = "发布作业")
     @SaCheckPermission("course:update")

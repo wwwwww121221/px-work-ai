@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,12 +40,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "1.1 后台-管理员管理")
 @RestController
 @RequestMapping("/admin-user")
+@RequiredArgsConstructor
 public class AdminUserController {
 
-    @Autowired
-    private AdminUserService adminUserService;
-    @Autowired
-    private AdminUserRoleService adminUserRoleService;
+    private final AdminUserService adminUserService;
+    private final AdminUserRoleService adminUserRoleService;
 
     @Operation(summary = "管理员分页列表", description = "获取管理员分页列表")
     @SaCheckPermission("system:admin:list")

@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,13 +23,12 @@ import com.pxwork.system.mapper.AdminUserRoleMapper;
 import com.pxwork.system.service.AdminRoleService;
 
 @Service
+@RequiredArgsConstructor
 public class AdminRoleServiceImpl extends ServiceImpl<AdminRoleMapper, AdminRole> implements AdminRoleService {
 
-    @Autowired
-    private AdminRoleMenuMapper adminRoleMenuMapper;
+    private final AdminRoleMenuMapper adminRoleMenuMapper;
 
-    @Autowired
-    private AdminUserRoleMapper adminUserRoleMapper;
+    private final AdminUserRoleMapper adminUserRoleMapper;
 
     @Override
     public Page<AdminRole> pageWithPermissionCount(Page<AdminRole> page, String name) {

@@ -1,8 +1,8 @@
 package com.pxwork.api.service;
 
 import java.time.LocalDate;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CertificateAutoEffectJob {
 
-    @Autowired
-    private CertificateService certificateService;
+    private final CertificateService certificateService;
 
     // 每天 00:10 执行一次：将公示满 3 天的证书自动生效
     @Scheduled(cron = "0 10 0 * * ?")

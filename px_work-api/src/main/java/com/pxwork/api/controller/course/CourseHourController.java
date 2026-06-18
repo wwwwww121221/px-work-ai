@@ -1,8 +1,8 @@
 package com.pxwork.api.controller.course;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +25,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "2.4 后台-课程课时管理")
 @RestController
 @RequestMapping("/course/hour")
+@RequiredArgsConstructor
 public class CourseHourController {
 
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
 
     @Operation(summary = "获取章节课时列表")
     @GetMapping("/list")

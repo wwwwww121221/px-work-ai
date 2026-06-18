@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +25,12 @@ import com.pxwork.course.service.ExamService;
 import com.pxwork.course.service.QuestionService;
 
 @Service
+@RequiredArgsConstructor
 public class ExamQuestionServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestion> implements ExamQuestionService {
 
-    @Autowired
-    private ExamService examService;
+    private final ExamService examService;
 
-    @Autowired
-    private QuestionService questionService;
+    private final QuestionService questionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

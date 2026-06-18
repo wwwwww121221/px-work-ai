@@ -7,15 +7,15 @@ import com.pxwork.course.entity.CourseHour;
 import com.pxwork.course.mapper.CourseChapterMapper;
 import com.pxwork.course.service.CourseChapterService;
 import com.pxwork.course.service.CourseHourService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
 @Service
+@RequiredArgsConstructor
 public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, CourseChapter> implements CourseChapterService {
 
-    @Autowired
-    private CourseHourService courseHourService;
+    private final CourseHourService courseHourService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

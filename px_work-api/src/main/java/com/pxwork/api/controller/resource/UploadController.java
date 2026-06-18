@@ -2,9 +2,9 @@ package com.pxwork.api.controller.resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,16 +36,14 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "2.5 后台-素材资源管理")
 @RestController
 @RequestMapping("/upload")
+@RequiredArgsConstructor
 public class UploadController {
 
-    @Autowired
-    private ResourceService resourceService;
+    private final ResourceService resourceService;
 
-    @Autowired
-    private MinioService minioService;
+    private final MinioService minioService;
 
-    @Autowired
-    private ResourceCategoryService resourceCategoryService;
+    private final ResourceCategoryService resourceCategoryService;
 
     @Operation(summary = "上传文件", description = "上传文件并根据module存放到不同子目录")
     @PostMapping(value = "/{module}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

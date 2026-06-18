@@ -2,8 +2,8 @@ package com.pxwork.api.controller.backend;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,13 +25,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "1.0 后台-登录与认证")
 @RestController
 @RequestMapping("/backend")
+@RequiredArgsConstructor
 public class BackendLoginController {
 
-    @Autowired
-    private AdminUserService adminUserService;
+    private final AdminUserService adminUserService;
 
-    @Autowired
-    private StpInterface stpInterface;
+    private final StpInterface stpInterface;
 
     @Operation(summary = "后台管理员登录")
     @PostMapping("/login")
